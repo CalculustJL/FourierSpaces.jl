@@ -2,7 +2,7 @@
 
 Goals
 - [ ] Transformation-based spaces
-    - [ ] Fourier space
+    - [X] Fourier space
     - [ ] Sine space
     - [ ] Cosine space
     - [ ] Ultraspeherical space
