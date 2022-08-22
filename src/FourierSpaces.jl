@@ -7,7 +7,7 @@ using LinearAlgebra
 
 using FFTW
 using CUDA
-import Adapt
+using Adapt
 
 include("utils.jl")
 include("type.jl")
