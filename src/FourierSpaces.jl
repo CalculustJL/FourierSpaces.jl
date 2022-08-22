@@ -1,11 +1,13 @@
 module FourierSpaces
 
+using Reexport
+@reexport using AbstractPDEInterfaces
+
+using LinearAlgebra
+
 using FFTW
 using CUDA
 import Adapt
-
-using Reexport
-@reexport using AbstractPDEInterfaces
 
 include("utils.jl")
 include("type.jl")

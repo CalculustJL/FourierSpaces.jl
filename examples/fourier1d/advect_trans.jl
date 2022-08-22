@@ -2,7 +2,7 @@
 using FourierSpaces
 let
     # add dependencies to env stack
-    pkgpath = dirname(dirname(pathof(FourierSpace)))
+    pkgpath = dirname(dirname(pathof(FourierSpaces)))
     tstpath = joinpath(pkgpath, "test")
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
     nothing

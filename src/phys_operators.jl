@@ -84,7 +84,7 @@ function Spaces.advectionOp(vels::NTuple{D},
                             truncation_fracs=nothing,
                            ) where{D}
 
-    VV = _pair_update_funcs(vels, vel_update_funcs)
+    VV = Spaces._pair_update_funcs(vels, vel_update_funcs)
     M  = massOp(space, discr)
 
     C = if M isa IdentityOperator # Collocation

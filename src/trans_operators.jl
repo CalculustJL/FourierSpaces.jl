@@ -83,9 +83,9 @@ function Spaces.advectionOp(vels::NTuple{D},
 
     VV = begin
         trunc = cache_operator(F \ Xh, vels[1])
-        vel_funcs = ComposedUpdateFunction.((trunc,), vel_update_funcs, deepcopy(vels))
+        vel_funcs = Spaces.ComposedUpdateFunction.((trunc,), vel_update_funcs, deepcopy(vels))
 
-        _pair_update_funcs((F,) .\ vels, vel_funcs)
+        Spaces._pair_update_funcs((F,) .\ vels, vel_funcs)
     end
 
     MM  = Diagonal([M  for i=1:D])

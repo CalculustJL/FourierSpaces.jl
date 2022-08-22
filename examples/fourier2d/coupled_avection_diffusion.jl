@@ -1,15 +1,15 @@
 #
-using PDEInterfaces
+using FourierSpaces
 let
     # add dependencies to env stack
-    pkgpath = dirname(dirname(pathof(PDEInterfaces)))
+    pkgpath = dirname(dirname(pathof(FourierSpaces)))
     tstpath = joinpath(pkgpath, "test")
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
     nothing
 end
 
 using OrdinaryDiffEq, Plots
-using ComponentArrays, UnPack
+using ComponentArrays
 
 nx = 32
 ny = 32
