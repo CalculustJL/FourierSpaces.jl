@@ -12,7 +12,7 @@ using OrdinaryDiffEq, LinearAlgebra, Random
 using Plots
 
 N = 1024
-ν = 1e-3
+ν = 1e-2
 p = nothing
 
 Random.seed!(0)
@@ -21,6 +21,7 @@ function uIC(space)
     X = truncationOp(space, (1/8,))
 
     u0 = X * rand(size(x)...)
+    u0 = @. cos(x+pi/2)
 end
 
 odecb = begin
@@ -35,7 +36,7 @@ end
 
 function solve_burgers1D(N, ν, p;
                          uIC=uIC,
-                         tspan=(0.0, 10.0),
+                         tspan=(0.0, 5.0),
                          nsims=1,
                          nsave=100,
                          odealg=SSPRK43(),
@@ -78,6 +79,7 @@ sol, space = solve_burgers1D(N, ν, p)
 space = cpu(space)
 pred = Array(sol)
 
-anim = animate(pred[:,1,:], space, sol.t)
+anim = animate(pred[:,1,:], space, sol.t,
+               legend=false, linewidth=2, color=:black, xlabel="x", ylabel="u(x,t)")
 gif(anim, joinpath(dirname(@__FILE__), "burgers.gif"), fps=20)
 #

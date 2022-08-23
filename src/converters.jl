@@ -21,7 +21,7 @@ function (::Type{T})(space::FourierSpace) where{T<:Number}
     make_transform(space, u0; p=p)
 end
 
-function Adapt.adapt_structure(to, space::FourierSpace)
+function adapt_structure(to, space::FourierSpace)
     grid  = adapt_structure(to, points(space))
     freqs = adapt_structure(to, modes(space))
     mass_mat = adapt_structure(to, mass_matrix(space))
