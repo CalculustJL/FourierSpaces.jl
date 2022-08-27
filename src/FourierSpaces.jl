@@ -4,6 +4,7 @@ using Reexport
 @reexport using AbstractPDEInterfaces
 
 using LinearAlgebra
+using SparseArrays
 
 using FFTW
 using CUDA
