@@ -75,22 +75,10 @@ function Spaces.form_transform(
         reshape(V, sinput)
     end
 
-    FunctionOperator(
-                     fwd;
-                     isinplace=true,
-                     #outofplace=true, # TODO https://github.com/SciML/SciMLOperators.jl/pull/96
-                     T=Complex{T},
-                     size=(M,N),
-
-                     input_prototype=u,
-                     output_prototype=v,
-
-                     op_inverse=bwd,
-                     op_adjoint=bwd,
-                     op_adjoint_inverse=fwd,
-
-                     p=p,
-                     t=t,
-                    )
+    FunctionOperator(fwd, u, v;
+                     op_inverse = bwd,
+                     op_adjoint = bwd,
+                     op_adjoint_inverse = fwd,
+                     p = p)
 end
 #
