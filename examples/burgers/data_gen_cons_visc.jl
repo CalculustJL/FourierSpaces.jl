@@ -1,8 +1,8 @@
 #
-using PDEInterfaces
+using FourierSpaces
 let
     # add dependencies to env stack
-    pkgpath = dirname(dirname(pathof(PDEInterfaces)))
+    pkgpath = dirname(dirname(pathof(FourierSpaces)))
     tstpath = joinpath(pkgpath, "test")
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
     nothing
@@ -14,7 +14,7 @@ using CUDA, Random, JLD2, Plots
 Random.seed!(0)
 CUDA.allowscalar(false)
 
-function uIC(space; truncation_frac=N_target/N)
+function uIC(space; truncation_frac=10/N)
     x = points(space)[1]
     X = truncationOp(space, (truncation_frac,))
 
@@ -106,7 +106,7 @@ function process(datafile; fps=20)
     nothing
 end
 
-function datagen_burgers1D(N, ν, p, N_target, filename; kwargs...)
+function datagen_burgers1D(N, ν, p, Ntarget, filename; kwargs...)
 
     sol, space = solve_burgers1D(N, ν, p; kwargs...)
 
@@ -114,10 +114,10 @@ function datagen_burgers1D(N, ν, p, N_target, filename; kwargs...)
     sp_dense = make_transform(space, u_dense) |> cpu
 
     sp_coarse = begin
-        sz = (N_target, size(u_dense)[2:end]...)
+        sz = (Ntarget, size(u_dense)[2:end]...)
         u  = similar(u_dense, sz)
 
-        make_transform(FourierSpace(N_target), u)
+        make_transform(FourierSpace(Ntarget), u)
     end
 
     J = interpOp(sp_coarse, sp_dense)
@@ -138,9 +138,9 @@ N = 1024
 ν = 1f-3
 p = nothing
 
-N_target = 128
+Ntarget = 64
 
 filename = "burgers_nu1em3_n1024"
-datafile = datagen_burgers1D(N, ν, p, N_target, filename)
+datafile = datagen_burgers1D(N, ν, p, Ntarget, filename)
 process(datafile)
 #

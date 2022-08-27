@@ -1,7 +1,15 @@
 
 module Burgers1D
 
-using PDEInterfaces
+using FourierSpaces
+let
+    # add dependencies to env stack
+    pkgpath = dirname(dirname(pathof(FourierSpaces)))
+    tstpath = joinpath(pkgpath, "test")
+    !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
+    nothing
+end
+
 
 using OrdinaryDiffEq, CUDA, LinearAlgebra, ComponentArrays
 using Lux, Random, JLD2, SciMLSensitivity, Zygote
