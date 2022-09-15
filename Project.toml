@@ -1,7 +1,7 @@
 name = "FourierSpaces"
 uuid = "f3d7ce31-8807-4b9f-8144-4bd3ed8f0112"
 authors = ["Vedant Puri <vedantpuri@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 AbstractPDEInterfaces = "db474457-f03d-4fd7-b196-5f323c96c803"
