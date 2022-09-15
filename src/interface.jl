@@ -7,9 +7,7 @@ Spaces.domain(space::FourierSpace) = space.dom
 
 Spaces.points(space::FourierSpace) = space.grid
 
-Spaces.local_numbering(space::FourierSpace) = 1:length(space)
-
-Spaces.global_numbering(space::FourierSpace) = local_numbering(space)
+Spaces.global_numbering(space::FourierSpace) = 1:length(space)
 
 function Spaces.quadratures(space::FourierSpace{<:Any,1})
     x = points(space) |> first
