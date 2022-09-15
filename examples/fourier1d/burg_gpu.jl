@@ -1,8 +1,8 @@
 #
-using FourierSpace
+using FourierSpaces
 let
     # add dependencies to env stack
-    pkgpath = dirname(dirname(pathof(FourierSpace)))
+    pkgpath = dirname(dirname(pathof(FourierSpaces)))
     tstpath = joinpath(pkgpath, "test")
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
     nothing
@@ -15,12 +15,13 @@ Random.seed!(0)
 CUDA.allowscalar(false)
 
 N = 1024
+Nmodes = 10
 ν = 1f-3
 p = nothing
 
 function uIC(space)
     x = points(space)[1]
-    X = truncationOp(space, (1/8,))
+    X = truncationOp(space, (Nmodes/N,))
 
     u0 = if x isa CUDA.CuArray
         X * CUDA.rand(size(x)...)
