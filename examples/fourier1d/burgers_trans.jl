@@ -8,7 +8,7 @@ let
     nothing
 end
 
-using OrdinaryDiffEq, LinearAlgebra
+using OrdinaryDiffEq, LinearSolve, LinearAlgebra
 using Plots, Test
 
 N = 1024
@@ -58,10 +58,24 @@ F̂ = forcingOp(zero(û0), tspace, discr; f_update_func=forcing!)
 
 Dt = cache_operator(Â-Ĉ+F̂, û0)
 
+Dt_implicit = cache_operator(Â, û0)
+Dt_explicit = cache_operator(-Ĉ+F̂, û0)
+
+dudt_implicit = function(du, u, p, t)
+    Dt_implicit(du, u, p, t)
+end
+
+dudt_explicit = function(du, u, p, t)
+    Dt_explicit(du, u, p, t)
+end
+
+Dt = SplitFunction(dudt_implicit, dudt_explicit; jac_prototype=Diagonal(û0))
+
 """ time discr """
 tspan = (0.0, 10.0)
 tsave = range(tspan...; length=100)
-odealg = SSPRK43()
+#odealg = SSPRK43()
+odealg = TRBDF2(autodiff=false, linsolve=KrylovJL_GMRES())
 prob = ODEProblem(Dt, û0, tspan, p)
 
 @time sol = solve(prob, odealg, saveat=tsave, callback=odecb)
