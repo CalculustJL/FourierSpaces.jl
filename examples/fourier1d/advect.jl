@@ -45,11 +45,9 @@ u0 = uIC(x)
 """ time discr """
 tspan = (0.0, 10.0)
 tsave = (0, π/4, π/2, 3π/4, 2π,)
-#tsave = (0, 2π,)
-odealg = Rodas5(autodiff=false)
-#odealg = Tsit5()
+odealg = Tsit5()
 prob = SplitODEProblem(A, F, u0, tspan, p)
-@time sol = solve(prob, odealg, saveat=tsave, abstol=1e-8, reltol=1e-8)
+@time sol = solve(prob, odealg, saveat=tsave, abstol=1e-9, reltol=1e-9)
 
 """ analysis """
 pred = Array(sol)

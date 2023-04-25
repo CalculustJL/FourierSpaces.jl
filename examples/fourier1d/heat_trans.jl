@@ -38,10 +38,10 @@ F̂ = cache_operator(F̂, k)
 """ time discr """
 tspan = (0.0, 10.0)
 tsave = range(tspan...; length=10)
-odealg = Rodas5(autodiff=false)
+odealg = Tsit5()
 prob = SplitODEProblem(Â, F̂, û0, tspan, p)
 
-@time sol = solve(prob, odealg, saveat=tsave)
+@time sol = solve(prob, odealg, saveat=tsave, abstol=1e-9, reltol=1e-9)
 
 """ analysis """
 pred = iftr.(sol.u, nothing, 0)
@@ -61,5 +61,5 @@ end
 display(plt)
 
 err = norm(pred .- ut, Inf)
-@test err < 1e-6
+@test err < 1e-8
 #
