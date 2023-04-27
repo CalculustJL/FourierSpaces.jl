@@ -35,6 +35,7 @@ end
 
 function FourierSpace(n::Integer;
                       domain::Domains.AbstractDomain{<:Any,1}=FourierDomain(1),
+                      T::Type{<:Real} = Float64,
                      )
 
     dom = if domain isa IntervalDomain
@@ -52,8 +53,7 @@ function FourierSpace(n::Integer;
     #dom = ref_dom # map_from_ref(dom, ref_dom) # TODO
 
     dz = L / n
-    z  = range(start=-L/2, stop=L/2-dz, length=n) |> Array
-    T  = eltype(z)
+    z = linspace(-L/2, L/2-dz, n, T)
 
     FFTLIB = _fft_lib(z)
     k = FFTLIB.rfftfreq(n, 2π*n/L) |> Array
@@ -82,6 +82,7 @@ end
 
 function FourierSpace(nr::Integer, ns::Integer;
                       domain::Domains.AbstractDomain{<:Any,2}=FourierDomain(2),
+                      T::Type{<:Number} = Float64,
                      )
 
     dom = if domain isa BoxDomain
@@ -98,8 +99,8 @@ function FourierSpace(nr::Integer, ns::Integer;
 
     dr = Lr / nr
     ds = Ls / ns
-    zr = range(start=-Lr/2, stop=Lr/2-dr, length=nr) |> Array
-    zs = range(start=-Lr/2, stop=Lr/2-ds, length=ns) |> Array
+    zr = linspace(-Lr/2, Lr/2-dr, nr, T)
+    zs = linspace(-Ls/2, Ls/2-ds, ns, T)
 
     FFTLIB = _fft_lib(zr)
     kr = FFTLIB.rfftfreq(nr, 2π*nr/Lr) |> Array
@@ -109,8 +110,6 @@ function FourierSpace(nr::Integer, ns::Integer;
 
     r, s   = vec.(ndgrid(zr, zs))
     kr, ks = vec.(ndgrid(kr, ks))
-
-    T  = eltype(r)
 
     npoints = (nr, ns)
     nfreqs  = (nkr, nks)
