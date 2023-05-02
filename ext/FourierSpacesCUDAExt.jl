@@ -7,5 +7,5 @@ else
     using ..FourierSpaces
 end
 
-_fft_lib(::CUDA.CuArray) = CUDA.CUFFT
+FourierSpaces._fft_lib(::CUDA.CuArray) = CUDA.CUFFT
 # overloads here
