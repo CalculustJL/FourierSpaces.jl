@@ -6,11 +6,15 @@ version = "0.2.1"
 [deps]
 AbstractPDEInterfaces = "db474457-f03d-4fd7-b196-5f323c96c803"
 Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
-CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+GPUArraysCore = "46192b85-c4d5-4398-a991-12ede77f4527"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+
+[weakdeps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 
 [compat]
 AbstractPDEInterfaces = "0.2.1"
@@ -19,3 +23,6 @@ CUDA = "3.12.0, 4"
 FFTW = "1.5.0"
 Reexport = "1.2.2"
 julia = "1.6"
+
+[extension]
+FourierSpacesCUDAExt = "CUDA"

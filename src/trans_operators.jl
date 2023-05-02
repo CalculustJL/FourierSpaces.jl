@@ -31,7 +31,7 @@ function Spaces.truncationOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpa
 
         a[(Colon() for i=1:d-1)..., idx, (Colon() for i=d+1:D)...] .= false
     end
-    a = points(space)[1] isa CUDA.CuArray ? gpu(a) : a
+    a = points(space)[1] isa GPUArraysCore.AbstractGPUArray ? gpu(a) : a
 
     DiagonalOperator(vec(a))
 end
@@ -42,7 +42,7 @@ function Spaces.gradientOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace
 
     # https://math.mit.edu/~stevenj/fft-deriv.pdf
     iks = [@. im*ks[i] for i=1:D]
-    for i=1:D iseven(ns[i]) && CUDA.@allowscalar iks[i][end] = 0  end
+    for i=1:D iseven(ns[i]) && GPUArraysCore.@allowscalar iks[i][end] = 0  end
 
     DiagonalOperator.(iks)
 end

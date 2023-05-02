@@ -3,12 +3,12 @@ module FourierSpaces
 using Reexport
 @reexport using AbstractPDEInterfaces
 
+using FFTW
 using LinearAlgebra
 using SparseArrays
 
-using FFTW
-using CUDA
 import Adapt: adapt_structure, adapt_storage
+using GPUArraysCore
 
 include("utils.jl")
 include("type.jl")
@@ -19,5 +19,15 @@ include("trans_operators.jl")
 include("phys_operators.jl")
 
 export FourierSpace
+
+import Requires
+
+@static if !isdefined(Base, :get_extension)
+    function __init__()
+        Requires.@require CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba" begin
+            include("../ext/FourierSpacesCUDAExt.jl")
+        end
+    end
+end
 
 end # module

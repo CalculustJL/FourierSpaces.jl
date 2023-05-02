@@ -1,6 +1,5 @@
 #
 _fft_lib(::AbstractArray) = FFTW
-_fft_lib(::CUDA.CuArray) = CUDA.CUFFT
 
 """
     linspace(start, stop, len, [T])
