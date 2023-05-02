@@ -66,6 +66,6 @@ for i=1:length(sol.u)
 end
 display(plt)
 
-err = norm(pred .- utr,Inf)
+err = norm(pred .- utr, Inf)
 @test err < 1e-8
 #
