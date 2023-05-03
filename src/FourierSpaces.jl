@@ -20,7 +20,9 @@ include("phys_operators.jl")
 
 export FourierSpace
 
-import Requires
+@static if !isdefined(Base, :get_extension)
+    import Requires
+end
 
 @static if !isdefined(Base, :get_extension)
     function __init__()
