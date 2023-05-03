@@ -1,4 +1,6 @@
 #
+module FourierSpacesCUDAExt
+
 if isdefined(Base, :get_extension)
     using CUDA
     using FourierSpaces
@@ -8,4 +10,5 @@ else
 end
 
 FourierSpaces._fft_lib(::CUDA.CuArray) = CUDA.CUFFT
-# overloads here
+
+end
