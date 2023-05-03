@@ -7,7 +7,7 @@ using FFTW
 using LinearAlgebra
 using SparseArrays
 
-import Adapt: adapt_structure, adapt_storage
+using Adapt: Adapt, adapt_structure
 using GPUArraysCore
 
 include("utils.jl")
