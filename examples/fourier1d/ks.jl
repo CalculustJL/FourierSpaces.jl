@@ -57,7 +57,7 @@ L = cache_operator(Â - B̂, û0)
 N = cache_operator(-Ĉ + F̂, û0)
 
 """ time discr """
-tspan = (0.0, 20)
+tspan = (0.0, 10)
 tsave = range(tspan...; length=10)
 odealg = Tsit5()
 odealg = SSPRK43()
@@ -78,8 +78,8 @@ end
 pred = iftr.(sol.u, nothing, 0)
 pred = hcat(pred...)
 
-plot(pred, label=nothing)
+# plot(pred, label=nothing)
 
-# anim = animate(pred, space, sol.t)
-# gif(anim, joinpath(dirname(@__FILE__), "ks.gif"), fps=20)
+anim = animate(pred, space, sol.t)
+gif(anim, joinpath(dirname(@__FILE__), "ks.gif"), fps=10)
 #

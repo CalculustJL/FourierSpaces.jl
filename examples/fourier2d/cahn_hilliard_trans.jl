@@ -19,12 +19,9 @@ x ∈ [0, L)ᵈ (periodic)
 
 """
 
-nx = 32
-ny = 32
+nx = ny = 32
+Lx = Ly = 10.0
 p = nothing
-
-Lx = 10.0
-Ly = 10.0
 
 """ space discr """
 domain = IntervalDomain(0, Lx) ⊗ IntervalDomain(0, Ly)
@@ -39,7 +36,10 @@ ftr  = transformOp(space)
 A = -laplaceOp(tspace, discr)
 B = biharmonicOp(tspace, discr)
 C = advectionOp((zero(û0),), tspace, discr; vel_update_funcs=(convection!,))
-F = SciMLOperators.NullOperator(tspace)
+
+function dfdu(v, u, p, t)
+end
+F = FunctionOperator(dfdu, u)
 
 L = cache_operator(Â + B̂, û0)
 N = cache_operator(-Ĉ+F̂, û0)
