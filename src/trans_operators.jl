@@ -61,7 +61,7 @@ function Spaces.laplaceOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}
     DiagonalOperator(ik2s |> sum)
 end
 
-function Spaces.biharmonicOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}) where{D}
+function Spaces.biharmonicOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}, ::Collocation) where{D}
     ks = points(space)
     ik4s = [@. ks[i]^4 for i=1:D]
 
