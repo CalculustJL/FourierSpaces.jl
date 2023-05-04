@@ -17,7 +17,8 @@ ny = 32
 p = nothing
 
 """ space discr """
-space = FourierSpace(nx, ny)
+domain = IntervalDomain(0, 2pi) ⊗ IntervalDomain(pi, 5pi)
+space = FourierSpace(nx, ny; domain = domain)
 discr = Collocation()
 
 x, y = points(space)
@@ -53,11 +54,11 @@ for i=2:length(sol.t)
     global ut = hcat(ut, utt)
 end
 
-anim = animate(pred, space)
-filename = joinpath(dirname(@__FILE__), "heat" * ".gif")
-gif(anim, filename, fps=5)
-
 err = norm(pred .- ut, Inf)
-println("frobenius norm of error across time", err)
+println("Frobenius norm of error across time ", err)
 @test err < 1e-7
+
+# anim = animate(pred, space)
+# filename = joinpath(dirname(@__FILE__), "heat" * ".gif")
+# gif(anim, filename, fps=5)
 #

@@ -34,7 +34,7 @@ end
 ###
 
 function FourierSpace(n::Integer;
-                      domain::Domains.AbstractDomain{<:Any,1}=FourierDomain(1),
+                      domain::Domains.AbstractDomain{<:Any,1} = FourierDomain(1),
                       T::Type{<:Real} = Float64,
                      )
 
@@ -46,24 +46,24 @@ function FourierSpace(n::Integer;
         @error "Trigonometric polynomials work with logically rectangular domains"
     end
 
-    dom = FourierDomain(1)
     (L,) = lengths(dom)
-    #""" reset deformation to map from [-π,π]^D """
-    #ref_dom = reference_box(2)
-    #dom = ref_dom # map_from_ref(dom, ref_dom) # TODO
+
+    # TOOD reset deformation to map from [-π,π]^D
+    # ref_dom = reference_box(2)
+    # dom = ref_dom # map_from_ref(dom, ref_dom) # TODO
 
     dz = L / n
     z = linspace(-L/2, L/2-dz, n, T)
 
     FFTLIB = _fft_lib(z)
-    k = FFTLIB.rfftfreq(n, 2π*n/L) |> Array
+    k = FFTLIB.rfftfreq(n, 2π * n / L) |> Array
 
     npoints = (n,)
     nfreqs  = (length(k),)
     dom = T(dom)
     grid = (z,)
     freqs = (k,)
-    mass_mat = ones(T, n) * (2π/L)
+    mass_mat = ones(T, n) * (2π / L)
     ftransform = nothing
 
     space = FourierSpace(
@@ -91,11 +91,11 @@ function FourierSpace(nr::Integer, ns::Integer;
         @error "Trigonometric polynomials work with logically rectangular domains"
     end
 
-    dom = FourierDomain(2)
     (Lr, Ls) = lengths(dom)
-    # reset deformation to map from [-π,π]^D
-    #ref_dom = reference_box(2)
-    #dom = ref_dom # map_from_ref(dom, ref_dom) # TODO
+
+    # TODO - reset deformation to map from [-π,π]^D
+    # ref_dom = reference_box(2)
+    # dom = ref_dom # map_from_ref(dom, ref_dom) # TODO
 
     dr = Lr / nr
     ds = Ls / ns
@@ -103,8 +103,8 @@ function FourierSpace(nr::Integer, ns::Integer;
     zs = linspace(-Ls/2, Ls/2-ds, ns, T)
 
     FFTLIB = _fft_lib(zr)
-    kr = FFTLIB.rfftfreq(nr, 2π*nr/Lr) |> Array
-    ks = FFTLIB.fftfreq(ns, 2π*ns/Ls)  |> Array
+    kr = FFTLIB.rfftfreq(nr, 2π * nr / Lr) |> Array
+    ks = FFTLIB.fftfreq( ns, 2π * ns / Ls) |> Array
     nkr = length(kr)
     nks = length(ks)
 
@@ -116,7 +116,7 @@ function FourierSpace(nr::Integer, ns::Integer;
     dom  = T(dom)
     grid    = (r, s)
     freqs   = (kr, ks)
-    mass_mat = ones(T, nr * ns) * (2π/Lr) * (2π/Ls)
+    mass_mat = ones(T, nr * ns) * (2π / Lr) * (2π / Ls)
     ftransform  = nothing
 
     space = FourierSpace(

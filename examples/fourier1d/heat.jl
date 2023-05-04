@@ -18,7 +18,7 @@ N = 128
 p = nothing
 
 """ space discr """
-space = FourierSpace(N)
+space = FourierSpace(N; domain = IntervalDomain(0, 2pi))
 discr = Collocation()
 
 (x,) = points(space)

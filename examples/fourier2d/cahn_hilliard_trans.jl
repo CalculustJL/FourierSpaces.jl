@@ -5,18 +5,30 @@ let
     pkgpath = dirname(dirname(pathof(FourierSpaces)))
     tstpath = joinpath(pkgpath, "test")
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
-    nothing
 end
 
 using OrdinaryDiffEq, ComponentArrays, LinearAlgebra
 using Plots, Test
 
+"""
+Cahn-Hilliard equation
+
+∂ₜu + Δu + Δ²u + = 0
+
+x ∈ [0, L)ᵈ (periodic)
+
+"""
+
 nx = 32
 ny = 32
 p = nothing
 
+Lx = 10.0
+Ly = 10.0
+
 """ space discr """
-space  = FourierSpace(N)
+domain = IntervalDomain(0, Lx) ⊗ IntervalDomain(0, Ly)
+space  = FourierSpace(N, domain = domain)
 tspace = transform(space)
 discr  = Collocation()
 
@@ -24,21 +36,13 @@ discr  = Collocation()
 iftr = transformOp(tspace)
 ftr  = transformOp(space)
 
-α = 1
-u0 = @. sin(α*x)
-û0 = ftr * u0
+A = -laplaceOp(tspace, discr)
+B = biharmonicOp(tspace, discr)
+C = advectionOp((zero(û0),), tspace, discr; vel_update_funcs=(convection!,))
+F = SciMLOperators.NullOperator(tspace)
 
-function convection!(v, u, p, t)
-    copy!(v, u)
-end
-
-Â = -laplaceOp(tspace, discr)
-B̂ = biharmonicOp(tspace, discr)
-Ĉ = advectionOp((zero(û0),), tspace, discr; vel_update_funcs=(convection!,))
-F̂ = SciMLOperators.NullOperator(tspace)
-
-L̂ = cache_operator(Â + B̂, û0)
-Ĝ = cache_operator(-Ĉ+F̂, û0)
+L = cache_operator(Â + B̂, û0)
+N = cache_operator(-Ĉ+F̂, û0)
 
 """ time discr """
 tspan = (0.0, 10.0)

@@ -8,7 +8,7 @@ let
 end
 
 using OrdinaryDiffEq, LinearAlgebra
-using Plots, Test
+using Plots, Test, Random
 
 """
 Kuramoto-Sivashinsky equation
@@ -23,11 +23,13 @@ https://en.wikipedia.org/wiki/Kuramoto%E2%80%93Sivashinsky_equation
 https://royalsocietypublishing.org/doi/epdf/10.1098/rspa.2014.0932
 """
 
-N = 64
+N = 128
+L = 10pi
 p = nothing
 
 """ space discr """
-space  = FourierSpace(N)
+domain = IntervalDomain(0, L)
+space = FourierSpace(N; domain = domain)
 tspace = transform(space)
 discr  = Collocation()
 
@@ -36,9 +38,11 @@ iftr = transformOp(tspace)
 ftr  = transformOp(space)
 
 Nic = 5
+Random.seed!(1234)
 u0 = rand(N)
 û0 = ftr * u0
 û0[Nic+1:end] .= 0
+û0[1] = 0
 
 function convect!(v, u, p, t)
     copy!(v, u)
@@ -49,19 +53,19 @@ B̂ = biharmonicOp(tspace, discr) # Δ²
 Ĉ = advectionOp((zero(û0),), tspace, discr; vel_update_funcs=(convect!,)) # uuₓ
 F̂ = SciMLOperators.NullOperator(tspace) # F = 0
 
-L̂ = cache_operator(Â - B̂, û0)
-Ĝ = cache_operator(-Ĉ + F̂, û0)
+L = cache_operator(Â - B̂, û0)
+N = cache_operator(-Ĉ + F̂, û0)
 
 """ time discr """
-tspan = (0.0, 1)
-tsave = range(tspan...; length=100)
+tspan = (0.0, 20)
+tsave = range(tspan...; length=10)
 odealg = Tsit5()
 odealg = SSPRK43()
-prob = SplitODEProblem(L̂, Ĝ, û0, tspan, p)
+prob = SplitODEProblem(L, N, û0, tspan, p)
 
 odecb = begin
     function affect!(int)
-        if int.iter % 10 == 0
+        if int.iter % 100 == 0
             println("[$(int.iter)] \t Time $(round(int.t; digits=8))s")
         end
     end
@@ -74,6 +78,8 @@ end
 pred = iftr.(sol.u, nothing, 0)
 pred = hcat(pred...)
 
-anim = animate(pred, space, sol.t)
-gif(anim, joinpath(dirname(@__FILE__), "ks.gif"), fps=20)
+plot(pred, label=nothing)
+
+# anim = animate(pred, space, sol.t)
+# gif(anim, joinpath(dirname(@__FILE__), "ks.gif"), fps=20)
 #
