@@ -13,20 +13,20 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
-[extension]
-FourierSpacesCUDAExt = "CUDA"
-
 [weakdeps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 
-[extras]
-CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
-
 [compat]
-Requires = "1"
 AbstractPDEInterfaces = "0.2.1"
 Adapt = "3.4.0"
 CUDA = "3.12.0, 4"
 FFTW = "1.5.0"
 Reexport = "1.2.2"
+Requires = "1"
 julia = "1.6"
+
+[extension]
+FourierSpacesCUDAExt = "CUDA"
+
+[extras]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"

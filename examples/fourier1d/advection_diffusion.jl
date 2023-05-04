@@ -41,7 +41,7 @@ F = cache_operator(F, x)
 """ time discr """
 tspan = (0.0, 10.0)
 tsave = range(tspan...; length=10)
-odealg = Rodas5(autodiff=false)
+odealg = Tsit5()
 prob = SplitODEProblem(A, F, u0, tspan, p)
 
 @time sol = solve(prob, odealg, saveat=tsave)

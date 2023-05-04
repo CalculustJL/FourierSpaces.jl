@@ -26,9 +26,9 @@ end
 
 odecb = begin
     function affect!(int)
-        println(
-                "[$(int.iter)] \t Time $(round(int.t; digits=8))s"
-               )
+        if int.iter % 100 == 0
+            println("[$(int.iter)] \t Time $(round(int.t; digits=8))s")
+        end
     end
 
     DiscreteCallback((u,t,int) -> true, affect!, save_positions=(false,false))

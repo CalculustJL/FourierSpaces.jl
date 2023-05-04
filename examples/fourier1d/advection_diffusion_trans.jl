@@ -5,7 +5,6 @@ let
     pkgpath = dirname(dirname(pathof(FourierSpaces)))
     tstpath = joinpath(pkgpath, "test")
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
-    nothing
 end
 
 using OrdinaryDiffEq, LinearSolve, LinearAlgebra
