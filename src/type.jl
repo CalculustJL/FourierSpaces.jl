@@ -53,7 +53,9 @@ function FourierSpace(n::Integer;
     # dom = ref_dom # map_from_ref(dom, ref_dom) # TODO
 
     dz = L / n
-    z = linspace(-L/2, L/2-dz, n, T)
+    z0 = dom.intervals[1].x0
+    z1 = dom.intervals[1].x1
+    z = linspace(z0, z1 - dz, n, T)
 
     FFTLIB = _fft_lib(z)
     k = FFTLIB.rfftfreq(n, 2π * n / L) |> Array
@@ -99,12 +101,21 @@ function FourierSpace(nr::Integer, ns::Integer;
 
     dr = Lr / nr
     ds = Ls / ns
-    zr = linspace(-Lr/2, Lr/2-dr, nr, T)
-    zs = linspace(-Ls/2, Ls/2-ds, ns, T)
+
+    r0 = dom.intervals[1].x0
+    r1 = dom.intervals[1].x1
+
+    s0 = dom.intervals[2].x0
+    s1 = dom.intervals[2].x1
+
+    zr = linspace(r0, r1 - dr, nr, T)
+    zs = linspace(s0, s1 - ds, ns, T)
 
     FFTLIB = _fft_lib(zr)
+
     kr = FFTLIB.rfftfreq(nr, 2π * nr / Lr) |> Array
     ks = FFTLIB.fftfreq( ns, 2π * ns / Ls) |> Array
+
     nkr = length(kr)
     nks = length(ks)
 
