@@ -54,18 +54,18 @@ function Spaces.hessianOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}
     DiagonalOperator.(ik2s)
 end
 
-function Spaces.laplaceOp(space::Spaces.TransformedSpace{<:Any,D,FourierSpace}, ::Collocation) where{D}
+function Spaces.laplaceOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}, ::Collocation) where{D}
     ks = points(space)
-    ik2 = [@. -ks[i]^2 for i=1:D] |> sum
+    ik2s = [@. ks[i]^2 for i=1:D]
 
-    DiagonalOperator.(ik2)
+    DiagonalOperator(ik2s |> sum)
 end
 
 function Spaces.biharmonicOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}) where{D}
     ks = points(space)
     ik4s = [@. ks[i]^4 for i=1:D]
 
-    DiagonalOperator.(ik4s)
+    DiagonalOperator(ik4s |> sum)
 end
 
 function Spaces.advectionOp(vels::NTuple{D},
