@@ -29,7 +29,7 @@ ftr  = transformOp(space)
 u0 = @. sin(α*x) * sin(β*y)
 
 """ operators """
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 F = SciMLOperators.NullOperator(space)
 
 A = cache_operator(A, x)

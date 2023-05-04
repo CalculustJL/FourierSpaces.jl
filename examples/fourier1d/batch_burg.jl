@@ -43,7 +43,7 @@ function solve_burgers(N, ν, p;
     space = make_transform(space, u0)
 
     """ operators """
-    A = diffusionOp(ν, space, discr)
+    A = -diffusionOp(ν, space, discr)
 
     function burgers!(v, u, p, t)
         copy!(v, u)

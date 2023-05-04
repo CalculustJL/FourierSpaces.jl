@@ -24,7 +24,7 @@ x, y = points(space)
 uIC(x,y) = @. sin(1x) * sin(1y)
 u0 = uIC(x,y)
 
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 
 velx = @. x*0 + 1.0
 vely = @. x*0 + 1.0

@@ -28,7 +28,7 @@ ftr  = transformOp(space)
 uic(x, y) = @. sin(α*x)*sin(β*y)
 utrue(t,x, y) = cos(t) * uic(x, y)
 
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 
 function forcing!(f, u, p, t)
     ui = -sin(t)*uic(x,y)

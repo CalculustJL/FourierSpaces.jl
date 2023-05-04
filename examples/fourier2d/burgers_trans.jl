@@ -70,8 +70,8 @@ tspace = transform(space)
 D̂tx, D̂ty = begin
     ca = û0.v̂x
 
-    Âx = diffusionOp(ν, tspace, discr)
-    Ây = diffusionOp(ν, tspace, discr)
+    Âx = -diffusionOp(ν, tspace, discr)
+    Ây = -diffusionOp(ν, tspace, discr)
 
     Ĉx = advectionOp((zero(ca), zero(ca)), tspace, discr;
                      vel_update_funcs=(

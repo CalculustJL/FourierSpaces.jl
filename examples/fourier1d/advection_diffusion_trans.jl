@@ -29,7 +29,7 @@ v = 0.0;
 vel = @. x*0 + v
 vels = (F * vel,)
 
-Â = diffusionOp(ν, tspace, discr)
+Â = -diffusionOp(ν, tspace, discr)
 Ĉ = advectionOp(vels, tspace, discr)
 F̂ = NullOperator(tspace)
 Dt = cache_operator(Â-Ĉ+F̂, im*k)

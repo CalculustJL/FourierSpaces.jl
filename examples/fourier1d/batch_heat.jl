@@ -29,7 +29,7 @@ u0 = @. sin(α*x)
 u0 = u0 * ones(1,2)
 space = make_transform(space, u0)
 
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 F = SciMLOperators.NullOperator(space)
 
 A = cache_operator(A, u0)

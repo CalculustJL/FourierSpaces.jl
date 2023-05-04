@@ -24,7 +24,7 @@ discr = Collocation()
 ftr = transformOp(space)
 
 """ operators """
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 
 v = 1.0; vel = @. x*0 + v
 C = advectionOp((vel,), space, discr)

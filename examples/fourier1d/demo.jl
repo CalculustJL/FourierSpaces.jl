@@ -8,7 +8,7 @@ space = FourierSpace(N)
 burgers!(v, u, p, t) = copy!(v, u)
 forcing!(f, u, p, t) = lmul!(false, f)
 
-A = diffusionOp(ν, space, Collocation())
+A = -diffusionOp(ν, space, Collocation())
 C = advectionOp((zero(x),), space, Collocation(); vel_update_funcs=(burgers!,))
 F = -C + forcingOp(zero(x), space, Collocation(); f_update_func=forcing!)
 

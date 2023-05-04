@@ -5,8 +5,10 @@ let
     pkgpath = dirname(dirname(pathof(FourierSpaces)))
     tstpath = joinpath(pkgpath, "test")
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
-    nothing
 end
+"""
+    du/dt = νΔu + IC
+"""
 
 using OrdinaryDiffEq, LinearAlgebra
 using Plots, Test
@@ -26,7 +28,7 @@ ftr  = transformOp(space)
 α = 5
 u0 = @. sin(α*x)
 
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 F = SciMLOperators.NullOperator(space)
 
 A = cache_operator(A, x)

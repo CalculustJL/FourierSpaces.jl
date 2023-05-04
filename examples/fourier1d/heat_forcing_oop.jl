@@ -30,7 +30,7 @@ function utrue(t,x)
     cos(t) * uic(x)
 end
 
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 
 f = @. x*0 + .1
 function forcing!(f, u, p, t)

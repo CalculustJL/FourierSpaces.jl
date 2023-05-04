@@ -29,7 +29,7 @@ u0 = @. sin(2x)
 #u0[20:end] .= 0
 #u0 = ftr \ u0
 
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 
 v = @. x*0 + 1
 C = advectionOp((v,), space, discr)

@@ -52,7 +52,7 @@ function forcing!(v, u, p, t)
     lmul!(false, v)
 end
 
-Â = diffusionOp(ν, tspace, discr)
+Â = -diffusionOp(ν, tspace, discr)
 Ĉ = advectionOp((zero(û0),), tspace, discr; vel_update_funcs=(burgers!,))
 F̂ = forcingOp(zero(û0), tspace, discr; f_update_func=forcing!)
 

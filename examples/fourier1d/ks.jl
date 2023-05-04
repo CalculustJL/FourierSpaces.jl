@@ -5,7 +5,6 @@ let
     pkgpath = dirname(dirname(pathof(FourierSpaces)))
     tstpath = joinpath(pkgpath, "test")
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
-    nothing
 end
 
 using OrdinaryDiffEq, LinearAlgebra
@@ -43,7 +42,7 @@ function convection!(v, u, p, t)
     copy!(v, u)
 end
 
-Â = laplaceOp(tspace, discr)
+Â = -laplaceOp(tspace, discr)
 B̂ = biharmonicOp(tspace, discr)
 Ĉ = advectionOp((zero(û0),), tspace, discr; vel_update_funcs=(convection!,))
 F̂ = SciMLOperators.NullOperator(tspace)

@@ -29,8 +29,8 @@ discr = Collocation()
 
 x, y = points(space)
 
-Ax = diffusionOp(ν, space, discr)
-Ay = diffusionOp(ν, space, discr)
+Ax = -diffusionOp(ν, space, discr)
+Ay = -diffusionOp(ν, space, discr)
 
 Cx = advectionOp((zero(x), zero(x)), space, discr;
                  vel_update_funcs=(
