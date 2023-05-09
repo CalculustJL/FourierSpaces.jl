@@ -17,11 +17,15 @@ Cahn-Hilliard equation
 
 x ∈ [0, L)ᵈ (periodic)
 
-# https://doi.org/10.1016/S0898-1221(02)00142-6
+numerical method
+https://doi.org/10.1016/S0898-1221(02)00142-6
+
+model
+https://pages.nist.gov/pfhub/benchmarks/benchmark1.ipynb/
 """
 
 Nx = Ny = 32
-Lx = Ly = 10.0
+Lx = Ly = 20.0
 p = nothing
 
 """ space discr """
@@ -56,6 +60,7 @@ function uic(x, y)
 end
 
 u0 = @. uic(x, y)
+u0 = ftr \ (ftr * u0)
 
 """
 F(u) = ρ * (u^2 - ua) * (u^2 - ub)
@@ -76,13 +81,14 @@ A = -laplaceOp(space, discr)
 B = biharmonicOp(space, discr)
 F = FunctionOperator(dfdu, u0;)
 
-L = cache_operator(M*A*F - κ*B, u0)
-N = cache_operator(F, u0)
+L = cache_operator(-κ*B, u0)
+N = cache_operator(M * A * F, u0)
 
 """ time discr """
 tspan = (0.0, 10.0)
 tsave = range(tspan...; length=10)
 odealg = Tsit5()
+odealg = SSPRK43()
 prob = SplitODEProblem(L, N, u0, tspan, p)
 
 odecb = begin

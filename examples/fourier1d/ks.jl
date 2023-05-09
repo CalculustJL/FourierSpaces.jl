@@ -57,8 +57,8 @@ L = cache_operator(Â - B̂, û0)
 N = cache_operator(-Ĉ + F̂, û0)
 
 """ time discr """
-tspan = (0.0, 10)
-tsave = range(tspan...; length=10)
+tspan = (0.0, 100)
+tsave = range(tspan...; length=100)
 odealg = Tsit5()
 odealg = SSPRK43()
 prob = SplitODEProblem(L, N, û0, tspan, p)
