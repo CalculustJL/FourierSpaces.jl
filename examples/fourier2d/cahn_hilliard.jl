@@ -24,8 +24,8 @@ model
 https://pages.nist.gov/pfhub/benchmarks/benchmark1.ipynb/
 """
 
-Nx = Ny = 32
-Lx = Ly = 20.0
+Nx = Ny = 64
+Lx = Ly = 50.0
 p = nothing
 
 """ space discr """
@@ -85,10 +85,10 @@ L = cache_operator(-κ*B, u0)
 N = cache_operator(M * A * F, u0)
 
 """ time discr """
-tspan = (0.0, 10.0)
+tspan = (0.0, 2.0)
 tsave = range(tspan...; length=10)
-odealg = Tsit5()
 odealg = SSPRK43()
+# odealg = Rodas5(autodiff = false, linsolve = )
 prob = SplitODEProblem(L, N, u0, tspan, p)
 
 odecb = begin
