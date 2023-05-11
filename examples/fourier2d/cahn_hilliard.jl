@@ -7,7 +7,7 @@ let
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
 end
 
-using OrdinaryDiffEq, LinearAlgebra
+using OrdinaryDiffEq, LinearSolve, LinearAlgebra
 using Plots, Test, Random
 
 """
@@ -87,21 +87,28 @@ N = cache_operator(M * A * F, u0)
 """ time discr """
 tspan = (0.0, 2.0)
 tsave = range(tspan...; length=10)
-odealg = SSPRK43()
-# odealg = Rodas5(autodiff = false, linsolve = )
-prob = SplitODEProblem(L, N, u0, tspan, p)
 
+odefun = SplitFunction(L, N; jac_prototype = L)
+# odealg = SSPRK43()
+# odealg = Rodas5(autodiff = false, linsolve = KrylovJL_GMRES())
+odealg = Rodas5(autodiff = false, linsolve = IterativeSolversJL_GMRES())
+
+odeprob = ODEProblem(odefun, u0, tspan, p)
 odecb = begin
-    function affect!(int)
-        if int.iter % 100 == 0
-            println("[$(int.iter)] \t Time $(round(int.t; digits=8))s")
-        end
-    end
-
+    affect!(int) = int.iter % 1 == 0 && println("[$(int.iter)] \t Time $(round(int.t; digits=8))s")
     DiscreteCallback((u,t,int) -> true, affect!, save_positions=(false,false))
 end
-@time sol = solve(prob, odealg, saveat=tsave, abstol=1e-4, callback=odecb)
 
-""" analysis """
+# preconditioner
+
+@time sol = solve(odeprob, odealg, saveat=tsave, abstol=1e-4, callback=odecb)
 pred = Array(sol)
+
+# err = open("error.txt", "w")
+# try
+#     sol = solve(odeprob, odealg)
+# catch e
+#     showerror(err, e, catch_backtrace())
+# end
+
 #

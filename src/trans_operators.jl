@@ -47,6 +47,7 @@ function Spaces.gradientOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace
     DiagonalOperator.(iks)
 end
 
+# TODO - make hessianOp, laplaceOp, biharmonicOp into InvertibleOperators
 function Spaces.hessianOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}) where{D}
     ks = points(space)
     ik2s = [@. -ks[i]^2 for i=1:D]

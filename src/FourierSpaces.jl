@@ -2,6 +2,7 @@ module FourierSpaces
 
 using Reexport
 @reexport using AbstractPDEInterfaces
+using SciMLOperators: InvertibleOperator
 
 using FFTW
 using LinearAlgebra
