@@ -1,7 +1,7 @@
 module FourierSpaces
 
 using Reexport
-@reexport using AbstractPDEInterfaces
+@reexport using CalculustCore
 using SciMLOperators: InvertibleOperator
 
 using FFTW
