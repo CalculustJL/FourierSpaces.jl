@@ -36,7 +36,8 @@ function forcing!(f, u, p, t)
     f .= ui - ud
     f
 end
-F = forcingOp(zero(x), space, discr; f_update_func=forcing!)
+
+F = forcingOp(zero(x), space, discr; f_update_func! = forcing!)
 
 A = cache_operator(A, x)
 F = cache_operator(F, x)

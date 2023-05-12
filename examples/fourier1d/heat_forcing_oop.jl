@@ -33,14 +33,16 @@ end
 A = -diffusionOp(ν, space, discr)
 
 f = @. x*0 + .1
-function forcing!(f, u, p, t)
+
+function forcing(f, u, p, t)
     ui = -sin(t)*uic(x)
     ud = -ν*α*α*uic(x)*cos(t)
-    f .= ui - ud
-    f
+
+    ui - ud
 end
-F = forcingOp(f, space, discr; f_update_func=forcing!)
-dudt = cache_operator(A+F, x)
+
+F = forcingOp(f, space, discr; f_update_func = forcing)
+dudt = cache_operator(A + F, x)
 
 """ time discr """
 u0 = uic(x)

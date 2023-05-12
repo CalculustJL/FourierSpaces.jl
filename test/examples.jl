@@ -4,8 +4,8 @@
     # Advection equation
     @time @safetestset "Advection" begin include("../examples/fourier1d/advect.jl") end
     @time @safetestset "Advection trans" begin include("../examples/fourier1d/advect_trans.jl") end
-
-    # Diffusion (heat) equation
+    
+    # # Diffusion (heat) equation
     @time @safetestset "Diffusion" begin include("../examples/fourier1d/heat.jl") end
     @time @safetestset "Diffusion forcing" begin include("../examples/fourier1d/heat_forcing.jl") end
     @time @safetestset "Diffusion trans" begin include("../examples/fourier1d/heat_trans.jl") end
@@ -19,7 +19,7 @@
     @time @safetestset "Burgers" begin include("../examples/fourier1d/burgers.jl") end
     @time @safetestset "Burgers Trans" begin include("../examples/fourier1d/burgers_trans.jl") end
     @time @safetestset "Burgers Batched" begin include("../examples/fourier1d/burgers_batched.jl") end
-
+    
     # Kuramoto-Sivashinsky equation
     @time @safetestset "Kuramoto-Sivashinsky" begin include("../examples/fourier1d/ks.jl") end
 

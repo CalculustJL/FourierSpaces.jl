@@ -57,7 +57,7 @@ L = cache_operator(Â - B̂, û0)
 N = cache_operator(-Ĉ + F̂, û0)
 
 """ time discr """
-tspan = (0.0, 100)
+tspan = (0.0, 1)
 tsave = range(tspan...; length=100)
 odealg = Tsit5()
 odealg = SSPRK43()

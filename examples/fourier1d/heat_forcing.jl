@@ -28,13 +28,15 @@ function utrue(t,x)
 end
 
 A = -diffusionOp(ν, space, discr)
+
 function forcing!(f, u, p, t)
     ui = -sin(t)*uic(x)
     ud = -ν*α*α*uic(x)*cos(t)
     f .= ui - ud
     f
 end
-F = forcingOp(zero(u0), space, discr; f_update_func=forcing!)
+
+F = forcingOp(zero(u0), space, discr; f_update_func! = forcing!)
 ddt = cache_operator(A+F, u0)
 
 function dudt(du, u, p, t)
