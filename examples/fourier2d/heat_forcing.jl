@@ -28,7 +28,7 @@ ftr  = transformOp(space)
 uic(x, y) = @. sin(α*x)*sin(β*y)
 utrue(t,x, y) = cos(t) * uic(x, y)
 
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 
 function forcing!(f, u, p, t)
     ui = -sin(t)*uic(x,y)
@@ -36,7 +36,8 @@ function forcing!(f, u, p, t)
     f .= ui - ud
     f
 end
-F = forcingOp(zero(x), space, discr; f_update_func=forcing!)
+
+F = forcingOp(zero(x), space, discr; f_update_func! = forcing!)
 
 A = cache_operator(A, x)
 F = cache_operator(F, x)

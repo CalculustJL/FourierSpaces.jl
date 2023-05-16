@@ -5,7 +5,6 @@ let
     pkgpath = dirname(dirname(pathof(FourierSpaces)))
     tstpath = joinpath(pkgpath, "test")
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
-    nothing
 end
 
 using OrdinaryDiffEq, LinearSolve, LinearAlgebra, Random, Sundials
@@ -43,7 +42,7 @@ function solve_burgers(N, ν, p;
     space = make_transform(space, u0)
 
     """ operators """
-    A = diffusionOp(ν, space, discr)
+    A = -diffusionOp(ν, space, discr)
 
     function burgers!(v, u, p, t)
         copy!(v, u)
@@ -69,33 +68,6 @@ function solve_burgers(N, ν, p;
     sol, space
 end
 
-function plot_sol(sol::ODESolution, space::FourierSpace)
-    x = points(space)[1]
-    plt = plot()
-    for i=1:length(sol)
-        plot!(plt, x, sol.u[i], legend=false)
-    end
-    plt
-end
-
-function anim8(sol::ODESolution, space::FourierSpace)
-    x = points(space)[1]
-    ylims = begin
-        u = sol.u[1]
-        mi = minimum(u)
-        ma = maximum(u)
-        buf = (ma-mi)/5
-        (mi-buf, ma+buf)
-    end
-    anim = @animate for i=1:length(sol)
-        plt = plot(x, sol.u[i], legend=false, ylims=ylims)
-    end
-end
-
 sol, space = solve_burgers(N, ν, p)
-#plt = plot_sol(sol, space)
-#anim = anim8(sol, space)
-#gif(anim, "examples/fourier/a.gif", fps= 20)
-
-#
 nothing
+#

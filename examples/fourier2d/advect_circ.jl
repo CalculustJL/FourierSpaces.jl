@@ -23,7 +23,7 @@ discr = Collocation()
 (x,y) = points(space)
 
 """ operators """
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 
 θ = @. atan.(y, x)
 r = @. sqrt(x*x + y*y)

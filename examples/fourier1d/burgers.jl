@@ -26,9 +26,9 @@ end
 
 odecb = begin
     function affect!(int)
-        println(
-                "[$(int.iter)] \t Time $(round(int.t; digits=8))s"
-               )
+        if int.iter % 100 == 0
+            println("[$(int.iter)] \t Time $(round(int.t; digits=8))s")
+        end
     end
 
     DiscreteCallback((u,t,int) -> true, affect!, save_positions=(false,false))
@@ -62,7 +62,7 @@ function solve_burgers1D(N, ν, p;
         lmul!(false, f)
     end
 
-    A = diffusionOp(ν, space, discr)
+    A = -diffusionOp(ν, space, discr)
     C = advectionOp((zero(u0),), space, discr; vel_update_funcs=(burgers!,))
     F = forcingOp(zero(u0), space, discr; f_update_func=forcing!)
     odefunc = cache_operator(A-C+F, u0) |> ODEFunction

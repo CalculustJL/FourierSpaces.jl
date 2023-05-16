@@ -17,9 +17,9 @@ p = nothing
 
 odecb = begin
     function affect!(int)
-        println(
-                "[$(int.iter)] \t Time $(round(int.t; digits=8))s"
-               )
+        if int.iter % 100 == 0
+            println("[$(int.iter)] \t Time $(round(int.t; digits=8))s")
+        end
     end
 
     DiscreteCallback((u,t,int) -> true, affect!, save_positions=(false,false))
@@ -52,7 +52,7 @@ function forcing!(v, u, p, t)
     lmul!(false, v)
 end
 
-Â = diffusionOp(ν, tspace, discr)
+Â = -diffusionOp(ν, tspace, discr)
 Ĉ = advectionOp((zero(û0),), tspace, discr; vel_update_funcs=(burgers!,))
 F̂ = forcingOp(zero(û0), tspace, discr; f_update_func=forcing!)
 
@@ -74,8 +74,8 @@ Dt = SplitFunction(dudt_implicit, dudt_explicit; jac_prototype=Diagonal(û0))
 """ time discr """
 tspan = (0.0, 10.0)
 tsave = range(tspan...; length=100)
-#odealg = SSPRK43()
-odealg = TRBDF2(autodiff=false, linsolve=KrylovJL_GMRES())
+odealg = Tsit5()
+# odealg = TRBDF2(autodiff=false, linsolve=KrylovJL_GMRES())
 prob = ODEProblem(Dt, û0, tspan, p)
 
 @time sol = solve(prob, odealg, saveat=tsave, callback=odecb)

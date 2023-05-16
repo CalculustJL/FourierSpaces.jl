@@ -23,7 +23,7 @@ discr = Collocation()
 (x,y) = points(space)
 
 """ operators """
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 
 vx = 1.0; velx = @. x*0 + vx
 vy = 1.0; vely = @. x*0 + vy
