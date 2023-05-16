@@ -30,7 +30,7 @@ F    = transformOp(space)
 u0 = @. sin(α*x) * sin(β*y)
 û0 = F * u0
 
-Â = diffusionOp(ν, tspace, discr)
+Â = -diffusionOp(ν, tspace, discr)
 F̂ = SciMLOperators.NullOperator(tspace)
 
 odefunc = cache_operator(Â + F̂, k)

@@ -5,7 +5,6 @@ let
     pkgpath = dirname(dirname(pathof(FourierSpaces)))
     tstpath = joinpath(pkgpath, "test")
     !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
-    nothing
 end
 
 using OrdinaryDiffEq, LinearSolve, LinearAlgebra
@@ -29,7 +28,7 @@ v = 0.0;
 vel = @. x*0 + v
 vels = (F * vel,)
 
-Â = diffusionOp(ν, tspace, discr)
+Â = -diffusionOp(ν, tspace, discr)
 Ĉ = advectionOp(vels, tspace, discr)
 F̂ = NullOperator(tspace)
 Dt = cache_operator(Â-Ĉ+F̂, im*k)

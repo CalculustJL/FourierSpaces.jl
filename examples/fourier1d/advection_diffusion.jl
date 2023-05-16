@@ -29,7 +29,7 @@ u0 = @. sin(2x)
 #u0[20:end] .= 0
 #u0 = ftr \ u0
 
-A = diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, space, discr)
 
 v = @. x*0 + 1
 C = advectionOp((v,), space, discr)
@@ -41,7 +41,7 @@ F = cache_operator(F, x)
 """ time discr """
 tspan = (0.0, 10.0)
 tsave = range(tspan...; length=10)
-odealg = Rodas5(autodiff=false)
+odealg = Tsit5()
 prob = SplitODEProblem(A, F, u0, tspan, p)
 
 @time sol = solve(prob, odealg, saveat=tsave)

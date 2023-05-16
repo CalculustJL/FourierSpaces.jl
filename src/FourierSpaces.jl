@@ -1,13 +1,14 @@
 module FourierSpaces
 
 using Reexport
-@reexport using AbstractPDEInterfaces
+@reexport using CalculustCore
+using SciMLOperators: InvertibleOperator
 
 using FFTW
 using LinearAlgebra
 using SparseArrays
 
-import Adapt: adapt_structure, adapt_storage
+using Adapt: Adapt, adapt_structure
 using GPUArraysCore
 
 include("utils.jl")
@@ -20,7 +21,9 @@ include("phys_operators.jl")
 
 export FourierSpace
 
-import Requires
+@static if !isdefined(Base, :get_extension)
+    import Requires
+end
 
 @static if !isdefined(Base, :get_extension)
     function __init__()
