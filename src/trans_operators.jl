@@ -47,7 +47,6 @@ function Spaces.gradientOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace
     DiagonalOperator.(iks)
 end
 
-# TODO - make hessianOp, laplaceOp, biharmonicOp into InvertibleOperators
 function Spaces.hessianOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}) where{D}
     ks = points(space)
     ik2s = [@. -ks[i]^2 for i=1:D]
@@ -57,16 +56,29 @@ end
 
 function Spaces.laplaceOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}, ::Collocation) where{D}
     ks = points(space)
-    ik2s = [@. ks[i]^2 for i=1:D]
+    ldiag = sum([@. ks[i]^2 for i=1:D])
 
-    DiagonalOperator(ik2s |> sum)
+    ldiag_ = copy(ldiag)
+    GPUArraysCore.@allowscalar ldiag_[1] = Inf
+
+    L = DiagonalOperator(ldiag)
+    Li = DiagonalOperator(inv.(ldiag_)) |> InvertedOperator
+
+    InvertibleOperator(L, Li)
 end
 
 function Spaces.biharmonicOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}, ::Collocation) where{D}
     ks = points(space)
-    ik4s = [@. ks[i]^4 for i=1:D]
+    ldiag = sum([@. ks[i]^2 for i=1:D])
+    bdiag = ldiag .^ 2
 
-    DiagonalOperator(ik4s |> sum)
+    bdiag_ = copy(bdiag)
+    GPUArraysCore.@allowscalar bdiag_[1] = Inf
+
+    L = DiagonalOperator(bdiag)
+    Li = DiagonalOperator(inv.(bdiag_)) |> InvertedOperator
+
+    InvertibleOperator(L, Li)
 end
 
 function Spaces.advectionOp(vels::NTuple{D},

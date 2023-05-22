@@ -2,7 +2,7 @@ module FourierSpaces
 
 using Reexport
 @reexport using CalculustCore
-using SciMLOperators: InvertibleOperator
+using SciMLOperators: InvertibleOperator, InvertedOperator
 
 using FFTW
 using LinearAlgebra
