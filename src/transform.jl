@@ -3,7 +3,7 @@ function Spaces.form_transform(
                                space::FourierSpace{<:Any,D},
                                u::Union{Nothing,AbstractVecOrMat}=nothing;
                                p=nothing,
-                               t::Union{Real,Nothing}=nothing,
+                               t::Union{Real,Nothing} = nothing,
                               ) where{D}
 
     # size dictionary

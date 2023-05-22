@@ -88,18 +88,20 @@ N = cache_operator(M * A * F, u0)
 tspan = (0.0, 2.0)
 tsave = range(tspan...; length=10)
 
-odefun = SplitFunction(L, N; jac_prototype = L)
-# odealg = SSPRK43()
-# odealg = Rodas5(autodiff = false, linsolve = KrylovJL_GMRES())
-odealg = Rodas5(autodiff = false, linsolve = IterativeSolversJL_GMRES())
+op = cache_operator(L + F, u0)
+
+odefun = ODEFunction(op; jac_prototype = op)
+# odefun = SplitFunction(L, N; jac_prototype = L)
+
+odealg = SSPRK43()
+# odealg = TRBDF2(autodiff = false, linsolve = KrylovJL_GMRES())
+# odealg = TRBDF2(autodiff = false, linsolve = IterativeSolversJL_GMRES())
 
 odeprob = ODEProblem(odefun, u0, tspan, p)
 odecb = begin
-    affect!(int) = int.iter % 1 == 0 && println("[$(int.iter)] \t Time $(round(int.t; digits=8))s")
+    affect!(int) = int.iter % 100 == 0 && println("[$(int.iter)] \t Time $(round(int.t; digits=8))s")
     DiscreteCallback((u,t,int) -> true, affect!, save_positions=(false,false))
 end
-
-# preconditioner
 
 @time sol = solve(odeprob, odealg, saveat=tsave, abstol=1e-4, callback=odecb)
 pred = Array(sol)
@@ -110,5 +112,5 @@ pred = Array(sol)
 # catch e
 #     showerror(err, e, catch_backtrace())
 # end
-
+nothing
 #
