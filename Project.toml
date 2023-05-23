@@ -25,7 +25,7 @@ FFTW = "1.5.0"
 GPUArraysCore = "0.1"
 Reexport = "1.2.2"
 Requires = "1"
-SciMLOperators = "0.2.8"
+SciMLOperators = "0.2.9"
 julia = "1.6"
 
 [extension]
