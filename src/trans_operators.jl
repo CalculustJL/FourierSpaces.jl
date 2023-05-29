@@ -41,17 +41,31 @@ function Spaces.gradientOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace
     ns = size(transform(space))
 
     # https://math.mit.edu/~stevenj/fft-deriv.pdf
-    iks = [@. im*ks[i] for i=1:D]
-    for i=1:D iseven(ns[i]) && GPUArraysCore.@allowscalar iks[i][end] = 0  end
+    gdiags = [@. im*ks[i] for i=1:D]
+    for d = 1:D
+        iseven(ns[d]) && GPUArraysCore.@allowscalar gdiags[d][end] = 0
+    end
 
-    DiagonalOperator.(iks)
+    DD = AbstractSciMLOperator[]
+    push!(DD, DiagonalOperator.(gdiags)...)
 end
 
 function Spaces.hessianOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}) where{D}
-    ks = points(space)
-    ik2s = [@. -ks[i]^2 for i=1:D]
 
-    DiagonalOperator.(ik2s)
+    DD = gradientOp(space)
+    DD_ = reshape(DD, (1, D))
+    HH = DD * DD_
+
+    # diagonals, ∂xx, require special treatment
+    ks = points(space)
+    hdiags = [@. -ks[i]^2 for i=1:D]
+    Hdiags = DiagonalOperator.(hdiags)
+
+    for d in 1:D
+        HH[d, d] = Hdiags[d]
+    end
+
+    HH
 end
 
 function Spaces.laplaceOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}, ::Collocation) where{D}
