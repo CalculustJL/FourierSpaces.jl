@@ -18,11 +18,11 @@ p = nothing
 
 """ space discr """
 domain = IntervalDomain(0, 2pi) × IntervalDomain(pi, 5pi)
-space = FourierSpace(nx, ny; domain = domain)
+V = FourierSpace(nx, ny; domain = domain)
 discr = Collocation()
 
-x, y = points(space)
-ftr  = transformOp(space)
+x, y = points(V)
+ftr  = transformOp(V)
 
 """ IC """
 α = 5
@@ -30,8 +30,8 @@ ftr  = transformOp(space)
 u0 = @. sin(α*x) * sin(β*y)
 
 """ operators """
-A = -diffusionOp(ν, space, discr)
-F = SciMLOperators.NullOperator(space)
+A = -diffusionOp(ν, V, discr)
+F = SciMLOperators.NullOperator(V)
 
 A = cache_operator(A, x)
 F = cache_operator(F, x)
@@ -58,7 +58,7 @@ err = norm(pred .- ut, Inf)
 println("Frobenius norm of error across time ", err)
 @test err < 1e-7
 
-# anim = animate(pred, space)
+# anim = animate(pred, V)
 # filename = joinpath(dirname(@__FILE__), "heat" * ".gif")
 # gif(anim, filename, fps=5)
 #

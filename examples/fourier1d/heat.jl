@@ -18,18 +18,18 @@ N = 128
 p = nothing
 
 """ space discr """
-space = FourierSpace(N; domain = IntervalDomain(0, 2pi))
+V = FourierSpace(N; domain = IntervalDomain(0, 2pi))
 discr = Collocation()
 
-(x,) = points(space)
-(k,) = modes(space)
-ftr  = transformOp(space)
+(x,) = points(V)
+(k,) = modes(V)
+ftr  = transformOp(V)
 
 α = 5
 u0 = @. sin(α*x)
 
-A = -diffusionOp(ν, space, discr)
-F = SciMLOperators.NullOperator(space)
+A = -diffusionOp(ν, V, discr)
+F = SciMLOperators.NullOperator(V)
 
 A = cache_operator(A, x)
 F = cache_operator(F, x)

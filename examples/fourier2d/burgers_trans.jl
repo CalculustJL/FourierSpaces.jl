@@ -31,11 +31,11 @@ odealg = Tsit5()
 odealg = SSPRK43()
 
 """ space discr """
-space  = FourierSpace(nx, ny)
+V  = FourierSpace(nx, ny)
 discr  = Collocation()
 
-x, y = points(space)
-F = transformOp(space)
+x, y = points(V)
+F = transformOp(V)
 
 odecb = begin
     function affect!(int)
@@ -48,7 +48,7 @@ odecb = begin
 end
 
 u0 = begin
-    X = truncationOp(space, (Nmodes//nx, Nmodes//ny))
+    X = truncationOp(V, (Nmodes//nx, Nmodes//ny))
     vx0 = X * rand(T, size(x)...)
     vy0 = X * rand(T, size(x)...)
 
@@ -63,32 +63,32 @@ û0 = begin
 end
 
 ps = ComponentArray(vel=û0)
-space = make_transform(space, F \ û0.v̂x; p=ps)
-tspace = transform(space)
+V = make_transform(V, F \ û0.v̂x; p=ps)
+Vh = transform(V)
 
 """ spce ops """
 D̂tx, D̂ty = begin
     ca = û0.v̂x
 
-    Âx = -diffusionOp(ν, tspace, discr)
-    Ây = -diffusionOp(ν, tspace, discr)
+    Âx = -diffusionOp(ν, Vh, discr)
+    Ây = -diffusionOp(ν, Vh, discr)
 
-    Ĉx = advectionOp((zero(ca), zero(ca)), tspace, discr;
+    Ĉx = advectionOp((zero(ca), zero(ca)), Vh, discr;
                      vel_update_funcs=(
                                        (v̂,û,p,t) -> copy!(v̂, p.vel.v̂x),
                                        (v̂,û,p,t) -> copy!(v̂, p.vel.v̂y),
                                       )
                     )
 
-    Ĉy = advectionOp((zero(ca), zero(ca)), tspace, discr;
+    Ĉy = advectionOp((zero(ca), zero(ca)), Vh, discr;
                      vel_update_funcs=(
                                        (v̂,û,p,t) -> copy!(v̂, p.vel.v̂x),
                                        (v̂,û,p,t) -> copy!(v̂, p.vel.v̂y),
                                       )
                     )
 
-    F̂x = NullOperator(tspace)
-    F̂y = NullOperator(tspace)
+    F̂x = NullOperator(Vh)
+    F̂y = NullOperator(Vh)
 
     D̂tx = cache_operator(Âx-Ĉx+F̂x, ca)
     D̂ty = cache_operator(Ây-Ĉy+F̂y, ca)
@@ -119,16 +119,16 @@ pred = Array(sol)
 v̂x = @views pred[:v̂x, :]
 v̂y = @views pred[:v̂y, :]
 
-space = make_transform(space, zeros(N, size(pred, 2)))
-F = transformOp(space)
+V = make_transform(V, zeros(N, size(pred, 2)))
+F = transformOp(V)
 vx = F \ v̂x
 vy = F \ v̂y
 
-anim = animate(vx, space, sol.t)
+anim = animate(vx, V, sol.t)
 filename = joinpath(dirname(@__FILE__), "burgers_trans_x" * ".gif")
 gif(anim, filename, fps=20)
 
-anim = animate(vy, space, sol.t)
+anim = animate(vy, V, sol.t)
 filename = joinpath(dirname(@__FILE__), "burgers_trans_y" * ".gif")
 gif(anim, filename, fps=20)
 #

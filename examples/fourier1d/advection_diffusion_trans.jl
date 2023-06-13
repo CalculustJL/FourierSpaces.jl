@@ -15,26 +15,26 @@ N = 128
 p = nothing
 
 """ space discr """
-space = FourierSpace(N)
-tspace = transform(space)
+V = FourierSpace(N)
+Vh = transform(V)
 discr = Collocation()
 
-(x,) = points(space)
-(k,) = modes(space)
-F  = transformOp(space)
+(x,) = points(V)
+(k,) = modes(V)
+F  = transformOp(V)
 
 """ operators """
 v = 0.0;
 vel = @. x*0 + v
 vels = (F * vel,)
 
-Â = -diffusionOp(ν, tspace, discr)
-Ĉ = advectionOp(vels, tspace, discr)
-F̂ = NullOperator(tspace)
+Â = -diffusionOp(ν, Vh, discr)
+Ĉ = advectionOp(vels, Vh, discr)
+F̂ = NullOperator(Vh)
 Dt = cache_operator(Â-Ĉ+F̂, im*k)
 
 """ IC """
-X = truncationOp(space, (32//N,))
+X = truncationOp(V, (32//N,))
 uu = rand(N)
 function uIC(x)
     X * uu

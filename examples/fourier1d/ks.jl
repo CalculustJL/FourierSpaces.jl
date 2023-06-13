@@ -29,13 +29,13 @@ p = nothing
 
 """ space discr """
 domain = IntervalDomain(0, L)
-space = FourierSpace(N; domain = domain)
-tspace = transform(space)
+V = FourierSpace(N; domain = domain)
+Vh = transform(V)
 discr  = Collocation()
 
-(x,) = points(space)
-iftr = transformOp(tspace)
-ftr  = transformOp(space)
+(x,) = points(V)
+iftr = transformOp(Vh)
+ftr  = transformOp(V)
 
 Nic = 5
 Random.seed!(1234)
@@ -48,10 +48,10 @@ function convect!(v, u, p, t)
     copy!(v, u)
 end
 
-Â = laplaceOp(tspace, discr) # -Δ
-B̂ = biharmonicOp(tspace, discr) # Δ²
-Ĉ = advectionOp((zero(û0),), tspace, discr; vel_update_funcs=(convect!,)) # uuₓ
-F̂ = SciMLOperators.NullOperator(tspace) # F = 0
+Â = laplaceOp(Vh, discr) # -Δ
+B̂ = biharmonicOp(Vh, discr) # Δ²
+Ĉ = advectionOp((zero(û0),), Vh, discr; vel_update_funcs=(convect!,)) # uuₓ
+F̂ = SciMLOperators.NullOperator(Vh) # F = 0
 
 L = cache_operator(Â - B̂, û0)
 N = cache_operator(-Ĉ + F̂, û0)
@@ -80,6 +80,6 @@ pred = hcat(pred...)
 
 # plot(pred, label=nothing)
 
-anim = animate(pred, space, sol.t)
+anim = animate(pred, V, sol.t)
 gif(anim, joinpath(dirname(@__FILE__), "ks.gif"), fps=10)
 #

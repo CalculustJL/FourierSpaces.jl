@@ -17,19 +17,19 @@ ny = 32
 p = nothing
 
 """ space discr """
-space = FourierSpace(nx, ny)
+V = FourierSpace(nx, ny)
 discr = Collocation()
 
-(x,y) = points(space)
+(x,y) = points(V)
 
 """ operators """
-A = -diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, V, discr)
 
 θ = @. atan.(y, x)
 r = @. sqrt(x*x + y*y)
 velx = @. -cos(θ)*r
 vely = @.  sin(θ)*r
-C = advectionOp((velx, vely), space, discr)
+C = advectionOp((velx, vely), V, discr)
 F = -C
 
 A = cache_operator(A, x)
@@ -57,7 +57,7 @@ for i=2:length(sol.u)
 end
 
 pred = utr
-anim = animate(pred, space)
+anim = animate(pred, V)
 filename = joinpath(dirname(@__FILE__), "advect_circ" * ".gif")
 gif(anim, filename, fps=5)
 

@@ -16,12 +16,12 @@ N = 1024
 p = nothing
 
 """ space discr """
-space = FourierSpace(N)
+V = FourierSpace(N)
 discr = Collocation()
 
-(x,) = points(space)
-(k,) = modes(space)
-ftr  = transformOp(space)
+(x,) = points(V)
+(k,) = modes(V)
+ftr  = transformOp(V)
 
 u0 = @. sin(2x)
 
@@ -29,10 +29,10 @@ u0 = @. sin(2x)
 #u0[20:end] .= 0
 #u0 = ftr \ u0
 
-A = -diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, V, discr)
 
 v = @. x*0 + 1
-C = advectionOp((v,), space, discr)
+C = advectionOp((v,), V, discr)
 F = -C
 
 A = cache_operator(A, x)

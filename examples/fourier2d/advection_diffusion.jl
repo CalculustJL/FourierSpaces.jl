@@ -16,19 +16,19 @@ ny = 32
 p = nothing
 
 """ space discr """
-space = FourierSpace(nx, ny)
+V = FourierSpace(nx, ny)
 discr = Collocation()
 
-x, y = points(space)
+x, y = points(V)
 
 uIC(x,y) = @. sin(1x) * sin(1y)
 u0 = uIC(x,y)
 
-A = -diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, V, discr)
 
 velx = @. x*0 + 1.0
 vely = @. x*0 + 1.0
-C = advectionOp((velx, vely), space, discr)
+C = advectionOp((velx, vely), V, discr)
 F = -C
 
 A = cache_operator(A, x)
@@ -43,7 +43,7 @@ prob = SplitODEProblem(A, F, u0, tspan, p)
 @time sol = solve(prob, odealg, saveat=tsave)
 pred = Array(sol)
 
-anim = animate(pred, space)
+anim = animate(pred, V)
 filename = joinpath(dirname(@__FILE__), "advection_diffusion" * ".gif")
 gif(anim, filename, fps=5)
 #

@@ -29,22 +29,22 @@ odecb = begin
 end
 
 """ space discr """
-space  = FourierSpace(N) |> gpu
-tspace = transform(space)
+V  = FourierSpace(N) |> gpu
+Vh = transform(V)
 discr  = Collocation()
 
-(x,) = points(space)
-(k,) = points(tspace)
-F    = transformOp(space)
+(x,) = points(V)
+(k,) = points(Vh)
+F    = transformOp(V)
 
 """ initial condition """
-function uIC(space)
-    x = points(space)[1]
-    X = truncationOp(space, (Nmodes/N,))
+function uIC(V::FourierSpace)
+    x = points(V)[1]
+    X = truncationOp(V, (Nmodes/N,))
 
     u0 = X * CUDA.rand(size(x)...)
 end
-u0 = uIC(space)
+u0 = uIC(V)
 û0 = F * u0
 
 function burgers!(v, u, p, t)
@@ -55,9 +55,9 @@ function forcing!(v, u, p, t)
     lmul!(false, v)
 end
 
-Â = -diffusionOp(ν, tspace, discr)
-Ĉ = advectionOp((zero(û0),), tspace, discr; vel_update_funcs=(burgers!,))
-F̂ = forcingOp(zero(û0), tspace, discr; f_update_func=forcing!)
+Â = -diffusionOp(ν, Vh, discr)
+Ĉ = advectionOp((zero(û0),), Vh, discr; vel_update_funcs=(burgers!,))
+F̂ = forcingOp(zero(û0), Vh, discr; f_update_func=forcing!)
 
 Dt = cache_operator(Â-Ĉ+F̂, û0)
 
@@ -73,6 +73,6 @@ prob = ODEProblem(Dt, û0, tspan, p)
 pred = [F,] .\ sol.u
 pred = hcat(pred...)
 
-anim = animate(pred, space, sol.t)
+anim = animate(pred, V, sol.t)
 gif(anim, joinpath(dirname(@__FILE__), "burg_trans.gif"), fps=20)
 #

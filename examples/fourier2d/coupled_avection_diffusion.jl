@@ -17,22 +17,22 @@ ny = 32
 p = nothing
 
 """ spatial discr """
-space = FourierSpace(nx, ny)
+V = FourierSpace(nx, ny)
 discr = Collocation()
 
-x, y = points(space)
+x, y = points(V)
 
-Ax = -diffusionOp(ν, space, discr)
-Ay = -diffusionOp(ν, space, discr)
+Ax = -diffusionOp(ν, V, discr)
+Ay = -diffusionOp(ν, V, discr)
 
-Cx = advectionOp((zero(x), zero(x)), space, discr;
+Cx = advectionOp((zero(x), zero(x)), V, discr;
                  vel_update_funcs=(
                                    (v,u,p,t) -> fill!(v, true),
                                    (v,u,p,t) -> fill!(v, true),
                                   )
                 )
 
-Cy = advectionOp((zero(x), zero(x)), space, discr;
+Cy = advectionOp((zero(x), zero(x)), V, discr;
                  vel_update_funcs=(
                                    (v,u,p,t) -> fill!(v, true),
                                    (v,u,p,t) -> fill!(v, true),
@@ -72,11 +72,11 @@ pred = Array(sol)
 vx = @views pred[:vx, :]
 vy = @views pred[:vy, :]
 
-anim = animate(vx, space)
+anim = animate(vx, V)
 filename = joinpath(dirname(@__FILE__), "burgers_x" * ".gif")
 gif(anim, filename, fps=5)
 
-anim = animate(vy, space)
+anim = animate(vy, V)
 filename = joinpath(dirname(@__FILE__), "burgers_y" * ".gif")
 gif(anim, filename, fps=5)
 #

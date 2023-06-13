@@ -16,21 +16,21 @@ N = 128
 p = nothing
 
 """ space discr """
-space  = FourierSpace(N)
-tspace = transform(space)
+V  = FourierSpace(N)
+Vh = transform(V)
 discr  = Collocation()
 
-(x,) = points(space)
-(k,) = points(tspace)
-iftr = transformOp(tspace)
-ftr  = transformOp(space)
+(x,) = points(V)
+(k,) = points(Vh)
+iftr = transformOp(Vh)
+ftr  = transformOp(V)
 
 α = 5
 u0 = @. sin(α*x)
 û0 = ftr * u0
 
-Â = -diffusionOp(ν, tspace, discr)
-F̂ = SciMLOperators.NullOperator(tspace)
+Â = -diffusionOp(ν, Vh, discr)
+F̂ = SciMLOperators.NullOperator(Vh)
 
 Â = cache_operator(Â, k)
 F̂ = cache_operator(F̂, k)

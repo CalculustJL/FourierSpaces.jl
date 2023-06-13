@@ -16,9 +16,9 @@ N = 1024
 p = nothing
 
 Random.seed!(0)
-function uIC(space)
-    x = points(space)[1]
-    X = truncationOp(space, (1/8,))
+function uIC(V::FourierSpace)
+    x = points(V)[1]
+    X = truncationOp(V, (1/8,))
 
     u0 = X * rand(size(x)...)
     u0 = @. cos(x+pi/2)
@@ -43,15 +43,15 @@ function solve_burgers1D(N, ν, p;
                         )
 
     """ space discr """
-    space = FourierSpace(N)
+    V = FourierSpace(N)
     discr = Collocation()
 
-    (x,) = points(space)
+    (x,) = points(V)
 
     """ IC """
-    u0 = [uIC(space) for i=1:nsims]
+    u0 = [uIC(V) for i=1:nsims]
     u0 = hcat(u0...)
-    space = make_transform(space, u0; p=p)
+    V = make_transform(V, u0; p=p)
 
     """ operators """
     function burgers!(v, u, p, t)
@@ -62,9 +62,9 @@ function solve_burgers1D(N, ν, p;
         lmul!(false, f)
     end
 
-    A = -diffusionOp(ν, space, discr)
-    C = advectionOp((zero(u0),), space, discr; vel_update_funcs=(burgers!,))
-    F = forcingOp(zero(u0), space, discr; f_update_func=forcing!)
+    A = -diffusionOp(ν, V, discr)
+    C = advectionOp((zero(u0),), V, discr; vel_update_funcs=(burgers!,))
+    F = forcingOp(zero(u0), V, discr; f_update_func=forcing!)
     odefunc = cache_operator(A-C+F, u0) |> ODEFunction
 
     """ time discr """
@@ -72,14 +72,14 @@ function solve_burgers1D(N, ν, p;
     prob = ODEProblem(odefunc, u0, tspan, p; reltol=1e-8, abstol=1e-8)
     @time sol = solve(prob, odealg, saveat=tsave, callback=odecb)
 
-    sol, space
+    sol, V
 end
 
-sol, space = solve_burgers1D(N, ν, p)
-space = cpu(space)
+sol, V = solve_burgers1D(N, ν, p)
+V = cpu(V)
 pred = Array(sol)
 
-anim = animate(pred[:,1,:], space, sol.t,
+anim = animate(pred[:,1,:], V, sol.t,
                legend=false, linewidth=2, color=:black, xlabel="x", ylabel="u(x,t)")
 gif(anim, joinpath(dirname(@__FILE__), "burgers.gif"), fps=20)
 #

@@ -15,10 +15,10 @@ N = 128
 p = nothing
 
 """ space discr """
-space = FourierSpace(N)
+V = FourierSpace(N)
 discr = Collocation()
 
-(x,) = points(space)
+(x,) = points(V)
 
 α = 2
 uic(x) = @. sin(α*x)
@@ -27,7 +27,7 @@ function utrue(t,x)
     cos(t) * uic(x)
 end
 
-A = -diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, V, discr)
 
 function forcing!(f, u, p, t)
     ui = -sin(t)*uic(x)
@@ -36,7 +36,7 @@ function forcing!(f, u, p, t)
     f
 end
 
-F = forcingOp(zero(u0), space, discr; f_update_func! = forcing!)
+F = forcingOp(zero(u0), V, discr; f_update_func! = forcing!)
 ddt = cache_operator(A+F, u0)
 
 function dudt(du, u, p, t)

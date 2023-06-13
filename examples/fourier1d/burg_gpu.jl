@@ -19,9 +19,9 @@ Nmodes = 10
 ν = 1f-3
 p = nothing
 
-function uIC(space)
-    x = points(space)[1]
-    X = truncationOp(space, (Nmodes/N,))
+function uIC(V::FourierSpace)
+    x = points(V)[1]
+    X = truncationOp(V, (Nmodes/N,))
 
     u0 = if x isa CUDA.CuArray
         X * CUDA.rand(size(x)...)
@@ -51,15 +51,15 @@ function solve_burgers1D(N, ν, p;
                         )
 
     """ space discr """
-    space = FourierSpace(N) |> gpu
+    V = FourierSpace(N) |> gpu
     discr = Collocation()
 
-    (x,) = points(space)
+    (x,) = points(V)
 
     """ IC """
-    u0 = [uIC(space) for i=1:nsims]
+    u0 = [uIC(V) for i=1:nsims]
     u0 = hcat(u0...)
-    space = make_transform(space, u0; p=p)
+    V = make_transform(V, u0; p=p)
 
     """ operators """
     function burgers!(v, u, p, t)
@@ -70,9 +70,9 @@ function solve_burgers1D(N, ν, p;
         lmul!(false, f)
     end
 
-    A = -diffusionOp(ν, space, discr)
-    C = advectionOp((zero(u0),), space, discr; vel_update_funcs=(burgers!,))
-    F = forcingOp(zero(u0), space, discr; f_update_func=forcing!)
+    A = -diffusionOp(ν, V, discr)
+    C = advectionOp((zero(u0),), V, discr; vel_update_funcs=(burgers!,))
+    F = forcingOp(zero(u0), V, discr; f_update_func=forcing!)
     odefunc = cache_operator(A-C+F, u0) |> ODEFunction
 
     """ time discr """
@@ -80,11 +80,11 @@ function solve_burgers1D(N, ν, p;
     prob = ODEProblem(odefunc, u0, tspan, p; reltol=1f-6, abstol=1f-6)
     @time sol = solve(prob, odealg, saveat=tsave, callback=odecb)
 
-    sol, space
+    sol, V
 end
 
-sol, space = solve_burgers1D(N, ν, p)
-space = cpu(space)
+sol, V = solve_burgers1D(N, ν, p)
+V = cpu(V)
 pred = Array(sol)
 nothing
 #

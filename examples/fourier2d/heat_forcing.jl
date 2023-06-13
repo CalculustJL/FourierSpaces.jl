@@ -17,18 +17,18 @@ ny = 32
 p = nothing
 
 """ space discr """
-space = FourierSpace(nx, ny)
+V = FourierSpace(nx, ny)
 discr = Collocation()
 
-x, y = points(space)
-ftr  = transformOp(space)
+x, y = points(V)
+ftr  = transformOp(V)
 
 α = 2
 β = 3
 uic(x, y) = @. sin(α*x)*sin(β*y)
 utrue(t,x, y) = cos(t) * uic(x, y)
 
-A = -diffusionOp(ν, space, discr)
+A = -diffusionOp(ν, V, discr)
 
 function forcing!(f, u, p, t)
     ui = -sin(t)*uic(x,y)
@@ -37,7 +37,7 @@ function forcing!(f, u, p, t)
     f
 end
 
-F = forcingOp(zero(x), space, discr; f_update_func! = forcing!)
+F = forcingOp(zero(x), V, discr; f_update_func! = forcing!)
 
 A = cache_operator(A, x)
 F = cache_operator(F, x)
@@ -60,7 +60,7 @@ for i=2:length(sol.t)
     global ut = hcat(ut, utt)
 end
 
-anim = animate(pred, space)
+anim = animate(pred, V)
 filename = joinpath(dirname(@__FILE__), "heat_forcing" * ".gif")
 gif(anim, filename, fps=5)
 

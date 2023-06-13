@@ -31,9 +31,9 @@ odealg = Tsit5()
 odealg = SSPRK43()
 
 """ spatial discr """
-space = FourierSpace(nx, ny) |> T
+V = FourierSpace(nx, ny) |> T
 discr = Collocation()
-x, y = points(space)
+x, y = points(V)
 
 odecb = begin
     function affect!(int)
@@ -47,7 +47,7 @@ end
 
 """ IC """
 u0 = begin
-    X = truncationOp(space, (Nmodes//nx, Nmodes//ny))
+    X = truncationOp(V, (Nmodes//nx, Nmodes//ny))
     vx0 = X * rand(T, size(x)...)
     vy0 = X * rand(T, size(x)...)
 
@@ -55,35 +55,35 @@ u0 = begin
 end
 
 ps = ComponentArray(vel=u0)
-space = make_transform(space, u0.vx; p=ps)
+V = make_transform(V, u0.vx; p=ps)
 
 # GPU
 #CUDA.allowscalar(false)
-#space = space |> gpu
-#x, y = points(space)
+#V = V |> gpu
+#x, y = points(V)
 #u0 = u0 |> gpu
 #ps = ps |> gpu
 
 """ spce ops """
-Ax = -diffusionOp(ν, space, discr)
-Ay = -diffusionOp(ν, space, discr)
+Ax = -diffusionOp(ν, V, discr)
+Ay = -diffusionOp(ν, V, discr)
 
-Cx = advectionOp((zero(x), zero(x)), space, discr;
+Cx = advectionOp((zero(x), zero(x)), V, discr;
                  vel_update_funcs=(
                                    (v,u,p,t) -> copy!(v, p.vel.vx),
                                    (v,u,p,t) -> copy!(v, p.vel.vy),
                                   )
                 )
 
-Cy = advectionOp((zero(x), zero(x)), space, discr;
+Cy = advectionOp((zero(x), zero(x)), V, discr;
                  vel_update_funcs=(
                                    (v,u,p,t) -> copy!(v, p.vel.vx),
                                    (v,u,p,t) -> copy!(v, p.vel.vy),
                                   )
                 )
 
-Fx = NullOperator(space)
-Fy = NullOperator(space)
+Fx = NullOperator(V)
+Fy = NullOperator(V)
 
 Dtx = cache_operator(Ax-Cx+Fx, x)
 Dty = cache_operator(Ay-Cy+Fy, x)
@@ -111,11 +111,11 @@ pred = Array(sol)
 vx = @views pred[:vx, :]
 vy = @views pred[:vy, :]
 
-anim = animate(vx, space, sol.t)
+anim = animate(vx, V, sol.t)
 filename = joinpath(dirname(@__FILE__), "burgers_x" * ".gif")
 gif(anim, filename, fps=20)
 
-anim = animate(vy, space, sol.t)
+anim = animate(vy, V, sol.t)
 filename = joinpath(dirname(@__FILE__), "burgers_y" * ".gif")
 gif(anim, filename, fps=20)
 #

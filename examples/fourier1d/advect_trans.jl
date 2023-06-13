@@ -15,20 +15,20 @@ N = 128
 p = nothing
 
 """ space discr """
-space = FourierSpace(N)
-tspace = transform(space)
+V = FourierSpace(N)
+Vh = transform(V)
 discr = Collocation()
 
-(x,) = points(space)
-(k,) = modes(space)
-F  = transformOp(space)
+(x,) = points(V)
+(k,) = modes(V)
+F  = transformOp(V)
 
 """ operators """
 v = 1.0;
 vel = @. x*0 + v
 vels = (F * vel,)
 
-Ĉ = advectionOp(vels, tspace, discr)
+Ĉ = advectionOp(vels, Vh, discr)
 F̂ = -Ĉ
 F̂ = cache_operator(F̂, im*k)
 

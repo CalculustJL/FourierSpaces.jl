@@ -17,21 +17,21 @@ ny = 32
 p = nothing
 
 """ space discr """
-space  = FourierSpace(nx, ny)
-tspace = transform(space)
+V  = FourierSpace(nx, ny)
+Vh = transform(V)
 discr  = Collocation()
 
-x, y = points(space)
-(k,) = points(tspace)
-F    = transformOp(space)
+x, y = points(V)
+(k,) = points(Vh)
+F    = transformOp(V)
 
 α = 5
 β = 3
 u0 = @. sin(α*x) * sin(β*y)
 û0 = F * u0
 
-Â = -diffusionOp(ν, tspace, discr)
-F̂ = SciMLOperators.NullOperator(tspace)
+Â = -diffusionOp(ν, Vh, discr)
+F̂ = SciMLOperators.NullOperator(Vh)
 
 odefunc = cache_operator(Â + F̂, k)
 

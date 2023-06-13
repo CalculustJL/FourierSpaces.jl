@@ -15,9 +15,9 @@ N = 1024
 p = nothing
 
 Random.seed!(0)
-function uIC(space)
-    x = points(space)[1]
-    X = truncationOp(space,(1//20,))
+function uIC(V::FourierSpace)
+    x = points(V)[1]
+    X = truncationOp(V,(1//20,))
 
     u0 = X * rand(size(x)...)
 
@@ -32,17 +32,17 @@ function solve_burgers(N, ν, p;
                       )
 
     """ space discr """
-    space = FourierSpace(N)
+    V = FourierSpace(N)
     discr = Collocation()
-    (x,)  = points(space)
+    (x,)  = points(V)
 
     """ IC """
-    u0 = uIC(space)
+    u0 = uIC(V)
     u0 = u0 * ones(1,nsims)
-    space = make_transform(space, u0)
+    V = make_transform(V, u0)
 
     """ operators """
-    A = -diffusionOp(ν, space, discr)
+    A = -diffusionOp(ν, V, discr)
 
     function burgers!(v, u, p, t)
         copy!(v, u)
@@ -53,8 +53,8 @@ function solve_burgers(N, ν, p;
 #       f .= 1e-2*rand(length(f))
     end
 
-    C = advectionOp((zero(u0),), space, discr; vel_update_funcs=(burgers!,))
-    F = -C + forcingOp(zero(u0), space, discr; f_update_func=forcing!)
+    C = advectionOp((zero(u0),), V, discr; vel_update_funcs=(burgers!,))
+    F = -C + forcingOp(zero(u0), V, discr; f_update_func=forcing!)
 
     A = cache_operator(A, u0)
     F = cache_operator(F, u0)
@@ -65,9 +65,9 @@ function solve_burgers(N, ν, p;
     prob = SplitODEProblem(A, F, u0, tspan, p)
     @time sol = solve(prob, odealg, saveat=tsave)
 
-    sol, space
+    sol, V
 end
 
-sol, space = solve_burgers(N, ν, p)
+sol, V = solve_burgers(N, ν, p)
 nothing
 #

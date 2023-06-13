@@ -30,13 +30,13 @@ p = nothing
 
 """ space discr """
 domain = IntervalDomain(0, Lx) × IntervalDomain(0, Ly)
-space  = FourierSpace(Nx, Ny; domain = domain)
-tspace = transform(space)
+V  = FourierSpace(Nx, Ny; domain = domain)
+Vh = transform(V)
 discr  = Collocation()
 
-(x, y,) = points(space)
-iftr = transformOp(tspace)
-ftr  = transformOp(space)
+(x, y,) = points(V)
+iftr = transformOp(Vh)
+ftr  = transformOp(V)
 
 ###
 # parameters
@@ -77,8 +77,8 @@ function dfdu(v, u, p, t)
 end
 
 # ∂ₜu = MΔf(u) - κΔ²u 
-A = -laplaceOp(space, discr)
-B = biharmonicOp(space, discr)
+A = -laplaceOp(V, discr)
+B = biharmonicOp(V, discr)
 F = FunctionOperator(dfdu, u0;)
 
 L = cache_operator(-κ*B, u0)
