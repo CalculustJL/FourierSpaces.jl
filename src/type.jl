@@ -34,29 +34,43 @@ end
 ###
 
 function FourierSpace(n::Integer;
-                      domain::Domains.AbstractDomain{<:Any,1} = FourierDomain(1),
+                      domain::AbstractDomain{<:Any,1} = FourierDomain(1),
                       T::Type{<:Real} = Float64,
                      )
 
-    dom = if domain isa IntervalDomain
-        BoxDomain(domain)
-    elseif domain isa BoxDomain
-        domain
+    # check for deformation
+    dom, mapping = if domain isa MappedDomain
+        domain.domain, domain.mapping
     else
-        @error "Trigonometric polynomials work with logically rectangular domains"
+        domain, nothing
     end
 
-    (L,) = lengths(dom)
+    # put domain in a box
+    dom = if dom isa IntervalDomain
+        ProductDomain(dom)
+    elseif dom isa BoxDomain
+        dom
+    else
+        msg = """Trigonometric polynomials work with logically rectangular
+            domains. `domain` must either be a `Domains.IntervalDomain`,
+            or product of interval domains created with `LinearAlgebra.×`.
+            Optionally `domain` may be a `Domains.MappedDomain` generated
+            as `Domains.deform(dom, mapping)`.
+            """
 
-    # TOOD reset deformation to map from [-π,π]^D
-    # ref_dom = reference_box(2)
-    # dom = ref_dom # map_from_ref(dom, ref_dom) # TODO
+        throw(ArgumentError(msg))
+    end
 
+    # get end points
+    bd = boundaries(dom.domains[1])
+    z0, z1 = convert.(Number, bd)
+
+    # get points
+    (L,) = expanse(dom)
     dz = L / n
-    z0 = dom.intervals[1].x0
-    z1 = dom.intervals[1].x1
     z = linspace(z0, z1 - dz, n, T)
 
+    # establish FFT library, and frequencies
     FFTLIB = _fft_lib(z)
     k = FFTLIB.rfftfreq(n, 2π * n / L) |> Array
 
@@ -68,14 +82,14 @@ function FourierSpace(n::Integer;
     mass_mat = ones(T, n) * (2π / L)
     ftransform = nothing
 
-    space = FourierSpace(
-                         npoints, nfreqs, dom, grid, freqs,
-                         mass_mat, ftransform,
-                        )
+    V = FourierSpace(
+                     npoints, nfreqs, dom, grid, freqs,
+                     mass_mat, ftransform,
+                    )
 
-    space = make_transform(space, z)
+    V = make_transform(V, z)
 
-    dom isa Domains.DeformedDomain ? deform(space, mapping) : space
+    isnothing(mapping) ? V : deform(V, mapping)
 end
 
 ###
@@ -83,36 +97,48 @@ end
 ###
 
 function FourierSpace(nr::Integer, ns::Integer;
-                      domain::Domains.AbstractDomain{<:Any,2}=FourierDomain(2),
+                      domain::Domains.AbstractDomain{<:Any,2} = FourierDomain(2),
                       T::Type{<:Number} = Float64,
                      )
 
-    dom = if domain isa BoxDomain
-        domain
+    # check for deformation
+    dom, mapping = if domain isa MappedDomain
+        domain.domain, domain.mapping
     else
-        @error "Trigonometric polynomials work with logically rectangular domains"
+        domain, nothing
     end
 
-    (Lr, Ls) = lengths(dom)
+    # put domain in a box
+    if !isa(dom, BoxDomain)
+        msg = """Trigonometric polynomials work with logically rectangular
+            domains. `domain` must be a product of `Domains.IntervalDomain`
+            created with `LinearAlgebra.×`. Optionally `domain` may be a
+            `Domains.MappedDomain` generated as `Domains.deform(dom, map)`.
+            """
 
-    # TODO - reset deformation to map from [-π,π]^D
-    # ref_dom = reference_box(2)
-    # dom = ref_dom # map_from_ref(dom, ref_dom) # TODO
+        throw(ArgumentError(msg))
+    end
+
+    # get end points
+    bd_r = boundaries(dom.domains[1])
+    bd_s = boundaries(dom.domains[2])
+
+    r0, r1 = convert.(Number, bd_r)
+    s0, s1 = convert.(Number, bd_s)
+
+    # get points
+    (Lr, Ls) = expanse(dom)
 
     dr = Lr / nr
     ds = Ls / ns
 
-    r0 = dom.intervals[1].x0
-    r1 = dom.intervals[1].x1
-
-    s0 = dom.intervals[2].x0
-    s1 = dom.intervals[2].x1
-
     zr = linspace(r0, r1 - dr, nr, T)
     zs = linspace(s0, s1 - ds, ns, T)
 
+    # establish FFT library
     FFTLIB = _fft_lib(zr)
 
+    # establish frequencies
     kr = FFTLIB.rfftfreq(nr, 2π * nr / Lr) |> Array
     ks = FFTLIB.fftfreq( ns, 2π * ns / Ls) |> Array
 
@@ -130,13 +156,13 @@ function FourierSpace(nr::Integer, ns::Integer;
     mass_mat = ones(T, nr * ns) * (2π / Lr) * (2π / Ls)
     ftransform  = nothing
 
-    space = FourierSpace(
-                         npoints, nfreqs, dom, grid, freqs,
-                         mass_mat, ftransform,
-                        )
+    V = FourierSpace(
+                     npoints, nfreqs, dom, grid, freqs,
+                     mass_mat, ftransform,
+                    )
 
-    space = make_transform(space, r)
+    V = make_transform(V, r)
 
-    dom isa Domains.DeformedDomain ? deform(space, mapping) : space
+    isnothing(mapping) ? V : deform(V, mapping)
 end
 #

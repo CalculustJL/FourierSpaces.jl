@@ -1,22 +1,21 @@
 #
-Spaces.size(space::FourierSpace) = space.npoints
+Spaces.size(V::FourierSpace) = V.npoints
 
-Spaces.mode_size(space::FourierSpace) = space.nfreqs
+Spaces.domain(V::FourierSpace) = V.dom
 
-Spaces.domain(space::FourierSpace) = space.dom
+Spaces.points(V::FourierSpace) = V.grid
 
-Spaces.points(space::FourierSpace) = space.grid
+Spaces.global_numbering(V::FourierSpace) = 1:length(V)
 
-Spaces.global_numbering(space::FourierSpace) = 1:length(space)
-
-function Spaces.quadratures(space::FourierSpace{<:Any,1})
-    x = points(space) |> first
-    w = mass_matrix(space)
+function Spaces.quadratures(V::FourierSpace{<:Any,1})
+    x = points(V) |> first
+    w = V.mass_mat
 
     ((x, w),)
 end
 
-Spaces.mass_matrix(space::FourierSpace) = space.mass_mat
+# TODO: Spaces.quadratures for ND FourierSpaces.
 
-Spaces.modes(space::FourierSpace) = space.freqs
+Spaces.modes(V::FourierSpace) = V.freqs
+Spaces.mode_size(V::FourierSpace) = V.nfreqs
 #

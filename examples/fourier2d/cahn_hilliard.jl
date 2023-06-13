@@ -29,7 +29,7 @@ Lx = Ly = 50.0
 p = nothing
 
 """ space discr """
-domain = IntervalDomain(0, Lx) ⊗ IntervalDomain(0, Ly)
+domain = IntervalDomain(0, Lx) × IntervalDomain(0, Ly)
 space  = FourierSpace(Nx, Ny; domain = domain)
 tspace = transform(space)
 discr  = Collocation()

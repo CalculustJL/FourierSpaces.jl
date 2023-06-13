@@ -3,16 +3,16 @@
 # operators in transformed space
 ###
 
-function Spaces.truncationOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace},
-                             fracs::Union{NTuple{D,Number},Nothing}=nothing) where{D}
+function Spaces.truncationOp(Vh::TransformedFourierSpace{<:Any,D},
+                             fracs::Union{NTuple{D}, Nothing}=nothing) where{D}
 
     fracs = fracs isa Nothing ? ([2//3 for d=1:D]) : fracs
 
     if isone(prod(fracs))
-        return IdentityOperator(space)
+        return IdentityOperator(Vh)
     end
 
-    ns = size(space)
+    ns = size(Vh)
 
     a = ones(Bool, ns)
     for d=1:D
@@ -31,33 +31,33 @@ function Spaces.truncationOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpa
 
         a[(Colon() for i=1:d-1)..., idx, (Colon() for i=d+1:D)...] .= false
     end
-    a = points(space)[1] isa GPUArraysCore.AbstractGPUArray ? gpu(a) : a
+    a = points(Vh)[1] isa AbstractGPUArray ? gpu(a) : a
 
     DiagonalOperator(vec(a))
 end
 
-function Spaces.gradientOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}) where{D}
-    ks = points(space)
-    ns = size(transform(space))
+function Spaces.gradientOp(Vh::TransformedFourierSpace{<:Any,D}) where{D}
+    ks = points(Vh)
+    ns = size(transform(Vh))
 
     # https://math.mit.edu/~stevenj/fft-deriv.pdf
     gdiags = [@. im*ks[i] for i=1:D]
     for d = 1:D
-        iseven(ns[d]) && GPUArraysCore.@allowscalar gdiags[d][end] = 0
+        iseven(ns[d]) && @allowscalar gdiags[d][end] = 0
     end
 
     DD = AbstractSciMLOperator[]
     push!(DD, DiagonalOperator.(gdiags)...)
 end
 
-function Spaces.hessianOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}) where{D}
+function Spaces.hessianOp(Vh::TransformedFourierSpace{<:Any,D}) where{D}
 
-    DD = gradientOp(space)
+    DD = gradientOp(Vh)
     DD_ = reshape(DD, (1, D))
     HH = DD * DD_
 
     # diagonals, ∂xx, require special treatment
-    ks = points(space)
+    ks = points(Vh)
     hdiags = [@. -ks[i]^2 for i=1:D]
     Hdiags = DiagonalOperator.(hdiags)
 
@@ -68,12 +68,12 @@ function Spaces.hessianOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}
     HH
 end
 
-function Spaces.laplaceOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}, ::Collocation) where{D}
-    ks = points(space)
+function Spaces.laplaceOp(Vh::TransformedFourierSpace{<:Any,D}, ::Collocation) where{D}
+    ks = points(Vh)
     ldiag = sum([@. ks[i]^2 for i=1:D])
 
     ldiag_ = copy(ldiag)
-    GPUArraysCore.@allowscalar ldiag_[1] = Inf
+    @allowscalar ldiag_[1] = Inf
 
     L = DiagonalOperator(ldiag)
     Li = DiagonalOperator(inv.(ldiag_)) |> InvertedOperator
@@ -81,13 +81,13 @@ function Spaces.laplaceOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}
     InvertibleOperator(L, Li)
 end
 
-function Spaces.biharmonicOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpace}, ::Collocation) where{D}
-    ks = points(space)
+function Spaces.biharmonicOp(Vh::TransformedFourierSpace{<:Any,D}, ::Collocation) where{D}
+    ks = points(Vh)
     ldiag = sum([@. ks[i]^2 for i=1:D])
     bdiag = ldiag .^ 2
 
     bdiag_ = copy(bdiag)
-    GPUArraysCore.@allowscalar bdiag_[1] = Inf
+    @allowscalar bdiag_[1] = Inf
 
     L = DiagonalOperator(bdiag)
     Li = DiagonalOperator(inv.(bdiag_)) |> InvertedOperator
@@ -96,17 +96,17 @@ function Spaces.biharmonicOp(space::Spaces.TransformedSpace{<:Any,D,<:FourierSpa
 end
 
 function Spaces.advectionOp(vels::NTuple{D},
-                            tspace::Spaces.TransformedSpace{T,D,<:FourierSpace},
-                            discr::Spaces.AbstractDiscretization;
+                            Wh::TransformedFourierSpace{T,D},
+                            discr::AbstractDiscretization;
                             vel_update_funcs=nothing,
                             truncation_fracs=nothing,
                            ) where{T,D}
 
-    space = transform(tspace)
+    W = transform(Wh)
 
-    F  = transformOp(space)
-    Xh = truncationOp(tspace, truncation_fracs)
-    M  = massOp(space, discr)
+    F  = transformOp(W)
+    Xh = truncationOp(Wh, truncation_fracs)
+    M  = massOp(W, discr)
 
     VV = begin
         trunc = cache_operator(F \ Xh, vels[1])
@@ -118,18 +118,18 @@ function Spaces.advectionOp(vels::NTuple{D},
     MM  = Diagonal([M  for i=1:D])
     XXh = Diagonal([Xh for i=1:D])
     FFi = Diagonal([inv(F)  for i=1:D])
-    DDh = gradientOp(tspace, discr)
+    DDh = gradientOp(Wh, discr)
 
     F * (VV' * MM * FFi * XXh * DDh)
 end
 
 # interpolation
-function Spaces.interpOp(space1::Spaces.TransformedSpace{<:Any,D,<:FourierSpace},
-                         space2::Spaces.TransformedSpace{<:Any,D,<:FourierSpace},
+function Spaces.interpOp(Vh1::TransformedFourierSpace{<:Any,D},
+                         Vh2::TransformedFourierSpace{<:Any,D},
                         ) where{D}
 
-    Ms = size(space1) # output
-    Ns = size(space2) # input
+    Ms = size(Vh1) # output
+    Ns = size(Vh2) # input
 
     sz = Tuple(zip(Ms,Ns))
     Js = Tuple(sparse(I, sz[i]) for i=1:D)

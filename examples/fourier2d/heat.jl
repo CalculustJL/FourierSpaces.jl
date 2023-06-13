@@ -17,7 +17,7 @@ ny = 32
 p = nothing
 
 """ space discr """
-domain = IntervalDomain(0, 2pi) ⊗ IntervalDomain(pi, 5pi)
+domain = IntervalDomain(0, 2pi) × IntervalDomain(pi, 5pi)
 space = FourierSpace(nx, ny; domain = domain)
 discr = Collocation()
 
