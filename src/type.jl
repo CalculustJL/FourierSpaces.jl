@@ -38,28 +38,29 @@ function FourierSpace(n::Integer;
                       T::Type{<:Real} = Float64,
                      )
 
-    # check for deformation
-    dom, mapping = if domain isa MappedDomain
-        domain.domain, domain.mapping
-    else
-        domain, nothing
-    end
-
-    # put domain in a box
-    dom = if dom isa IntervalDomain
-        ProductDomain(dom)
-    elseif dom isa BoxDomain
-        dom
-    else
+    if !isa(domain, Domains.LogicallyRectangularDomain)
         msg = """Trigonometric polynomials work with logically rectangular
             domains. `domain` must either be a `Domains.IntervalDomain`,
             or product of interval domains created with `LinearAlgebra.×`.
             Optionally `domain` may be a `Domains.MappedDomain` generated
             as `Domains.deform(dom, mapping)`.
             """
-
         throw(ArgumentError(msg))
     end
+
+    # check for deformation
+    dom, mapping = if domain isa Domains.MappedDomain
+        domain.domain, domain.mapping
+    else
+        domain, nothing
+    end
+
+    # put domain in a box
+    if dom isa IntervalDomain
+        dom = ProductDomain(dom)
+    end
+
+    @assert dom isa Domains.BoxedDomain
 
     # get end points
     bd = boundaries(dom.domains[1])
@@ -101,23 +102,24 @@ function FourierSpace(nr::Integer, ns::Integer;
                       T::Type{<:Number} = Float64,
                      )
 
+    if !isa(domain, Domains.LogicallyRectangularDomain)
+        msg = """Trigonometric polynomials work with logically rectangular
+            domains. `domain` must be a product of `Domains.IntervalDomain`
+            created with `LinearAlgebra.×`. Optionally `domain` may be a
+            `Domains.MappedDomain` generated as `Domains.deform(dom, map)`.
+            """
+        throw(ArgumentError(msg))
+    end
+
     # check for deformation
-    dom, mapping = if domain isa MappedDomain
+    dom, mapping = if domain isa Domains.MappedDomain
         domain.domain, domain.mapping
     else
         domain, nothing
     end
 
     # put domain in a box
-    if !isa(dom, BoxDomain)
-        msg = """Trigonometric polynomials work with logically rectangular
-            domains. `domain` must be a product of `Domains.IntervalDomain`
-            created with `LinearAlgebra.×`. Optionally `domain` may be a
-            `Domains.MappedDomain` generated as `Domains.deform(dom, map)`.
-            """
-
-        throw(ArgumentError(msg))
-    end
+    @assert isa(dom, Domains.BoxedDomain)
 
     # get end points
     bd_r = boundaries(dom.domains[1])

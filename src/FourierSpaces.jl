@@ -4,7 +4,7 @@ using Reexport
 
 @reexport using CalculustCore
 using CalculustCore.Spaces: AbstractSpace, AbstractDiscretization, TransformedSpace
-using CalculustCore.Domains: AbstractDomain, BoxDomain, MappedDomain, ProductDomain
+using CalculustCore.Domains: AbstractDomain, ProductDomain
 
 using SciMLOperators: AbstractSciMLOperator, InvertibleOperator, InvertedOperator
 
