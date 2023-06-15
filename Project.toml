@@ -1,7 +1,7 @@
 name = "FourierSpaces"
 uuid = "f3d7ce31-8807-4b9f-8144-4bd3ed8f0112"
 authors = ["Vedant Puri <vedantpuri@gmail.com>"]
-version = "0.2.2"
+version = "0.2.3"
 
 [deps]
 Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
@@ -20,7 +20,7 @@ CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 [compat]
 Adapt = "3.4.0"
 CUDA = "3.12.0, 4"
-CalculustCore = "0.3.1"
+CalculustCore = "0.4"
 FFTW = "1.5.0"
 GPUArraysCore = "0.1"
 Reexport = "1.2.2"
