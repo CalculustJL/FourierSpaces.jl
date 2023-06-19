@@ -46,8 +46,20 @@ function Spaces.gradientOp(Vh::TransformedFourierSpace{<:Any,D}) where{D}
         iseven(ns[d]) && @allowscalar gdiags[d][end] = 0
     end
 
-    DD = AbstractSciMLOperator[]
-    push!(DD, DiagonalOperator.(gdiags)...)
+    # inverse
+    gdiags_ = deepcopy(gdiags)
+    for d in 1:D
+        diag = gdiags_[d]
+        I = findall(iszero, diag)
+        @allowscalar diag[I] .= Inf
+    end
+    gdiags_ = [inv.(diag) for diag in gdiags_]
+
+    Ds  = DiagonalOperator.(gdiags)
+    Ds_ = DiagonalOperator.(gdiags_) .|> InvertedOperator
+    Ls  = InvertibleOperator.(Ds, Ds_)
+
+    AbstractSciMLOperator[Ls...]
 end
 
 function Spaces.hessianOp(Vh::TransformedFourierSpace{<:Any,D}) where{D}
@@ -72,7 +84,7 @@ function Spaces.laplaceOp(Vh::TransformedFourierSpace{<:Any,D}, ::Collocation) w
     ks = points(Vh)
     ldiag = sum([@. ks[i]^2 for i=1:D])
 
-    ldiag_ = copy(ldiag)
+    ldiag_ = deepcopy(ldiag)
     @allowscalar ldiag_[1] = Inf
 
     L = DiagonalOperator(ldiag)
@@ -86,7 +98,7 @@ function Spaces.biharmonicOp(Vh::TransformedFourierSpace{<:Any,D}, ::Collocation
     ldiag = sum([@. ks[i]^2 for i=1:D])
     bdiag = ldiag .^ 2
 
-    bdiag_ = copy(bdiag)
+    bdiag_ = deepcopy(bdiag)
     @allowscalar bdiag_[1] = Inf
 
     L = DiagonalOperator(bdiag)
