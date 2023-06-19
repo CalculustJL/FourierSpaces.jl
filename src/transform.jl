@@ -78,7 +78,7 @@ function Spaces.form_transform(
     FunctionOperator(fwd, u, v;
                      # awaiting https://github.com/SciML/OrdinaryDiffEq.jl/pull/1967
                      # then uncomment `batch` kwarg, remove SciMLOps 0.2 compat
-                     # batch = true,
+                     batch = true,
                      op_inverse = bwd,
                      op_adjoint = bwd,
                      op_adjoint_inverse = fwd,
