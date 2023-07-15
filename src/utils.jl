@@ -1,6 +1,4 @@
 #
-_fft_lib(::AbstractArray) = FFTW
-
 """
     linspace(start, stop, len, [T])
 

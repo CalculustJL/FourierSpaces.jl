@@ -71,9 +71,8 @@ function FourierSpace(n::Integer;
     dz = L / n
     z = linspace(z0, z1 - dz, n, T)
 
-    # establish FFT library, and frequencies
-    FFTLIB = _fft_lib(z)
-    k = FFTLIB.rfftfreq(n, 2π * n / L) |> Array
+    # establish frequencies
+    k = AbstractFFTs.rfftfreq(n, 2π * n / L) |> Array
 
     npoints = (n,)
     nfreqs  = (length(k),)
@@ -137,12 +136,9 @@ function FourierSpace(nr::Integer, ns::Integer;
     zr = linspace(r0, r1 - dr, nr, T)
     zs = linspace(s0, s1 - ds, ns, T)
 
-    # establish FFT library
-    FFTLIB = _fft_lib(zr)
-
     # establish frequencies
-    kr = FFTLIB.rfftfreq(nr, 2π * nr / Lr) |> Array
-    ks = FFTLIB.fftfreq( ns, 2π * ns / Ls) |> Array
+    kr = AbstractFFTs.rfftfreq(nr, 2π * nr / Lr) |> Array
+    ks = AbstractFFTs.fftfreq( ns, 2π * ns / Ls) |> Array
 
     nkr = length(kr)
     nks = length(ks)

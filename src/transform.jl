@@ -31,12 +31,12 @@ function Spaces.form_transform(
     U   = reshape(u, sz_in)
 
     # transform object
-    FFTLIB = _fft_lib(u)
-    ftr = FFTLIB.plan_rfft(U, 1:D)
+    ftr = AbstractFFTs.plan_rfft(U, 1:D)
 
-    # transform output shape
-    V    = ftr * U
-    sz_out = size(V)
+    # transform output
+    sz_out = AbstractFFTs.rfft_output_size(U, 1:D)
+    T_out = eltype(inv(ftr))
+    V = similar(U, T_out, sz_out)
 
     # output prototype
     M = length(V) ÷ K
@@ -76,12 +76,10 @@ function Spaces.form_transform(
     end
 
     FunctionOperator(fwd, u, v;
-                     # awaiting https://github.com/SciML/OrdinaryDiffEq.jl/pull/1967
-                     # then uncomment `batch` kwarg, remove SciMLOps 0.2 compat
-                     batch = true,
-                     op_inverse = bwd,
-                     op_adjoint = bwd,
-                     op_adjoint_inverse = fwd,
-                     p = p)
+        batch = true,
+        op_inverse = bwd,
+        op_adjoint = bwd,
+        op_adjoint_inverse = fwd,
+        p = p)
 end
 #

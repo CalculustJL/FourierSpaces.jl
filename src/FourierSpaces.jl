@@ -8,7 +8,8 @@ using CalculustCore.Domains: AbstractDomain, ProductDomain
 
 using SciMLOperators: AbstractSciMLOperator, InvertibleOperator, InvertedOperator
 
-using FFTW
+using AbstractFFTs
+using FFTW # TODO - rm FFTW and have user manually load backend
 using LinearAlgebra
 using SparseArrays
 
@@ -28,15 +29,17 @@ include("phys_operators.jl")
 
 export FourierSpace
 
+println("$@__MODULE__")
+
 @static if !isdefined(Base, :get_extension)
     import Requires
 end
 
 @static if !isdefined(Base, :get_extension)
     function __init__()
-        Requires.@require CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba" begin
-            include("../ext/FourierSpacesCUDAExt.jl")
-        end
+        # if FFT_BACKEND_NOT_LOADED
+        #     @debug """Please load an FFT backend such as FFTW.jl, or CUDA """
+        # end
     end
 end
 

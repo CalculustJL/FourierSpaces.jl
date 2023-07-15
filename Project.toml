@@ -4,6 +4,7 @@ authors = ["Vedant Puri <vedantpuri@gmail.com>"]
 version = "0.2.3"
 
 [deps]
+AbstractFFTs = "621f4979-c628-5d54-868e-fcf4e3e8185c"
 Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 CalculustCore = "d7326954-f021-11ed-2a08-d10e464848f1"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
@@ -14,12 +15,8 @@ Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 SciMLOperators = "c0aeaf25-5076-4817-a8d5-81caf7dfa961"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
-[weakdeps]
-CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
-
 [compat]
 Adapt = "3.4.0"
-CUDA = "3.12.0, 4"
 CalculustCore = "0.4"
 FFTW = "1.5.0"
 GPUArraysCore = "0.1"
@@ -28,8 +25,3 @@ Requires = "1"
 SciMLOperators = "0.3"
 julia = "1.6"
 
-[extension]
-FourierSpacesCUDAExt = "CUDA"
-
-[extras]
-CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
