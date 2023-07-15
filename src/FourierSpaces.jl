@@ -29,18 +29,11 @@ include("phys_operators.jl")
 
 export FourierSpace
 
-println("$@__MODULE__")
-
-@static if !isdefined(Base, :get_extension)
-    import Requires
-end
-
-@static if !isdefined(Base, :get_extension)
-    function __init__()
-        # if FFT_BACKEND_NOT_LOADED
-        #     @debug """Please load an FFT backend such as FFTW.jl, or CUDA """
-        # end
-    end
+function __init__()
+    # https://github.com/JuliaMath/AbstractFFTs.jl/issues/111
+    # if FFT_BACKEND_NOT_LOADED
+    #     @debug """Please load an FFT backend such as FFTW.jl, or CUDA """
+    # end
 end
 
 end # module
