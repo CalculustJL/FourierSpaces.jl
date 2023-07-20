@@ -77,9 +77,9 @@ function FourierSpace(n::Integer;
     npoints = (n,)
     nfreqs  = (length(k),)
     dom = T(dom)
-    grid = (z,)
-    freqs = (k,)
-    mass_mat = ones(T, n) * (2π / L)
+    grid = (T.(z),)
+    freqs = (T.(k),)
+    mass_mat = ones(T, n) * T(2π / L)
     ftransform = nothing
 
     V = FourierSpace(
@@ -149,9 +149,9 @@ function FourierSpace(nr::Integer, ns::Integer;
     npoints = (nr, ns)
     nfreqs  = (nkr, nks)
     dom  = T(dom)
-    grid    = (r, s)
-    freqs   = (kr, ks)
-    mass_mat = ones(T, nr * ns) * (2π / Lr) * (2π / Ls)
+    grid    = (T.(r), T.(s))
+    freqs   = (T.(kr), T.(ks))
+    mass_mat = ones(T, nr * ns) * T(2π / Lr) * T(2π / Ls)
     ftransform  = nothing
 
     V = FourierSpace(
