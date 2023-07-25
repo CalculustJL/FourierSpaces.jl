@@ -56,7 +56,7 @@ function Spaces.gradientOp(Vh::TransformedFourierSpace{<:Any, D}) where{D}
     AbstractSciMLOperator[Ls...]
 end
 
-function _gradientdiagonal(Vh::TransformedFourierSpace{<:Any, D}) where{D}
+function _gradient_diagonal(Vh::TransformedFourierSpace{<:Any, D}) where{D}
     ks = points(Vh)
     ns = size(transform(Vh))
 
