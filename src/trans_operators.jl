@@ -36,17 +36,11 @@ function Spaces.truncationOp(Vh::TransformedFourierSpace{<:Any,D},
     DiagonalOperator(vec(a))
 end
 
-function Spaces.gradientOp(Vh::TransformedFourierSpace{<:Any,D}) where{D}
-    ks = points(Vh)
-    ns = size(transform(Vh))
+function Spaces.gradientOp(Vh::TransformedFourierSpace{<:Any, D}) where{D}
 
-    # https://math.mit.edu/~stevenj/fft-deriv.pdf
-    gdiags = [@. im*ks[i] for i=1:D]
-    for d = 1:D
-        iseven(ns[d]) && @allowscalar gdiags[d][end] = 0
-    end
+    gdiags = _gradient_diagonal(Vh)
 
-    # inverse
+    # (zero mean) inverse
     gdiags_ = deepcopy(gdiags)
     for d in 1:D
         diag = gdiags_[d]
@@ -60,6 +54,19 @@ function Spaces.gradientOp(Vh::TransformedFourierSpace{<:Any,D}) where{D}
     Ls  = InvertibleOperator.(Ds, Ds_)
 
     AbstractSciMLOperator[Ls...]
+end
+
+function _gradientdiagonal(Vh::TransformedFourierSpace{<:Any, D}) where{D}
+    ks = points(Vh)
+    ns = size(transform(Vh))
+
+    # https://math.mit.edu/~stevenj/fft-deriv.pdf
+    gdiags = [@. im*ks[i] for i=1:D]
+    for d = 1:D
+        iseven(ns[d]) && @allowscalar gdiags[d][end] = 0
+    end
+
+    gdiags
 end
 
 function Spaces.hessianOp(Vh::TransformedFourierSpace{<:Any,D}) where{D}
@@ -84,6 +91,7 @@ function Spaces.laplaceOp(Vh::TransformedFourierSpace{<:Any,D}, ::Collocation) w
     ks = points(Vh)
     ldiag = sum([@. ks[i]^2 for i=1:D])
 
+    # (zero mean) inverse
     ldiag_ = deepcopy(ldiag)
     @allowscalar ldiag_[1] = Inf
 
@@ -98,6 +106,7 @@ function Spaces.biharmonicOp(Vh::TransformedFourierSpace{<:Any,D}, ::Collocation
     ldiag = sum([@. ks[i]^2 for i=1:D])
     bdiag = ldiag .^ 2
 
+    # (zero mean) inverse
     bdiag_ = deepcopy(bdiag)
     @allowscalar bdiag_[1] = Inf
 
