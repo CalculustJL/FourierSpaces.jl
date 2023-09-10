@@ -6,16 +6,16 @@
 function Spaces.truncationOp(Vh::TransformedFourierSpace{<:Any,D},
                              fracs::Union{NTuple{D}, Nothing}=nothing) where{D}
 
-    fracs = fracs isa Nothing ? ([2//3 for d=1:D]) : fracs
+    fracs = fracs isa Nothing ? ([2//3 for _ in 1:D]) : fracs
 
     if isone(prod(fracs))
         return IdentityOperator(Vh)
     end
 
     ns = size(Vh)
+    diag = ones(Bool, ns)
 
-    a = ones(Bool, ns)
-    for d=1:D
+    for d in 1:D
         n = ns[d]
         frac = fracs[d]
 
@@ -29,11 +29,11 @@ function Spaces.truncationOp(Vh::TransformedFourierSpace{<:Any,D},
             cut : n-cut
         end
 
-        a[(Colon() for i=1:d-1)..., idx, (Colon() for i=d+1:D)...] .= false
+        diag[(Colon() for _ in 1:d-1)..., idx, (Colon() for i=d+1:D)...] .= false
     end
-    a = points(Vh)[1] isa AbstractGPUArray ? gpu(a) : a
+    diag = points(Vh)[1] isa AbstractGPUArray ? gpu(diag) : diag
 
-    DiagonalOperator(vec(a))
+    DiagonalOperator(vec(diag))
 end
 
 function Spaces.gradientOp(Vh::TransformedFourierSpace{<:Any,D}) where{D}
