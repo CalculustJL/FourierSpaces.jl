@@ -33,14 +33,14 @@ Ax = -diffusionOp(ν, V, discr)
 Ay = -diffusionOp(ν, V, discr)
 
 Cx = advectionOp((zero(x), zero(x)), V, discr;
-                 vel_update_funcs=(
+                 vel_update_funcs! =(
                                    (v,u,p,t) -> copy!(v, u),
                                    (v,u,p,t) -> copy!(v, u),
                                   )
                 )
 
 Cy = advectionOp((zero(x), zero(x)), V, discr;
-                 vel_update_funcs=(
+                 vel_update_funcs! =(
                                    (v,u,p,t) -> copy!(v, u),
                                    (v,u,p,t) -> copy!(v, u),
                                   )

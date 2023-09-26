@@ -78,13 +78,14 @@ function _fusedGradientTruncationOp(V::FourierSpace{<:Any,D},
 end
 
 function Spaces.advectionOp(vels::NTuple{D},
-                            W::FourierSpace{<:Any,D},
-                            discr::AbstractDiscretization;
-                            vel_update_funcs=nothing,
-                            truncation_fracs=nothing,
-                           ) where{D}
+    W::FourierSpace{<:Any,D},
+    discr::AbstractDiscretization;
+    vel_update_funcs = nothing,
+    vel_update_funcs! = nothing,
+    truncation_fracs = nothing,
+) where{D}
 
-    VV = Spaces._pair_update_funcs(vels, vel_update_funcs)
+    VV = Spaces._pair_update_funcs(vels, vel_update_funcs, vel_update_funcs!)
     M  = massOp(W, discr)
 
     # TODO - does truncation make sense for galerkin?

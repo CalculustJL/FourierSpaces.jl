@@ -50,14 +50,14 @@ end
 
 Â = laplaceOp(Vh, discr) # -Δ
 B̂ = biharmonicOp(Vh, discr) # Δ²
-Ĉ = advectionOp((zero(û0),), Vh, discr; vel_update_funcs=(convect!,)) # uuₓ
+Ĉ = advectionOp((zero(û0),), Vh, discr; vel_update_funcs! =(convect!,)) # uuₓ
 F̂ = SciMLOperators.NullOperator(Vh) # F = 0
 
 L = cache_operator(Â - B̂, û0)
 N = cache_operator(-Ĉ + F̂, û0)
 
 """ time discr """
-tspan = (0.0, 1)
+tspan = (0.0, 100)
 tsave = range(tspan...; length=100)
 odealg = Tsit5()
 odealg = SSPRK43()

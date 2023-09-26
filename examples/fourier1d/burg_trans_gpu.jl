@@ -56,7 +56,7 @@ function forcing!(v, u, p, t)
 end
 
 Â = -diffusionOp(ν, Vh, discr)
-Ĉ = advectionOp((zero(û0),), Vh, discr; vel_update_funcs=(burgers!,))
+Ĉ = advectionOp((zero(û0),), Vh, discr; vel_update_funcs! = (burgers!,))
 F̂ = forcingOp(zero(û0), Vh, discr; f_update_func=forcing!)
 
 Dt = cache_operator(Â-Ĉ+F̂, û0)

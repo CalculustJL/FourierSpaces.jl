@@ -74,14 +74,14 @@ D̂tx, D̂ty = begin
     Ây = -diffusionOp(ν, Vh, discr)
 
     Ĉx = advectionOp((zero(ca), zero(ca)), Vh, discr;
-                     vel_update_funcs=(
+                     vel_update_funcs! =(
                                        (v̂,û,p,t) -> copy!(v̂, p.vel.v̂x),
                                        (v̂,û,p,t) -> copy!(v̂, p.vel.v̂y),
                                       )
                     )
 
     Ĉy = advectionOp((zero(ca), zero(ca)), Vh, discr;
-                     vel_update_funcs=(
+                     vel_update_funcs! =(
                                        (v̂,û,p,t) -> copy!(v̂, p.vel.v̂x),
                                        (v̂,û,p,t) -> copy!(v̂, p.vel.v̂y),
                                       )

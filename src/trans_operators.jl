@@ -108,23 +108,28 @@ function Spaces.biharmonicOp(Vh::TransformedFourierSpace{<:Any,D}, ::Collocation
 end
 
 function Spaces.advectionOp(vels::NTuple{D},
-                            Wh::TransformedFourierSpace{T,D},
-                            discr::AbstractDiscretization;
-                            vel_update_funcs=nothing,
-                            truncation_fracs=nothing,
-                           ) where{T,D}
+    Wh::TransformedFourierSpace{T,D},
+    discr::AbstractDiscretization;
+    vel_update_funcs = nothing,
+    vel_update_funcs! = nothing,
+    truncation_fracs= nothing,
+) where{T,D}
 
     W = transform(Wh)
 
-    F  = transformOp(W)
+    # phys ops
+    F = transformOp(W)
+    M = massOp(W, discr)
+
+    # trans ops
     Xh = truncationOp(Wh, truncation_fracs)
-    M  = massOp(W, discr)
 
     VV = begin
         trunc = cache_operator(F \ Xh, vels[1])
-        vel_funcs = Spaces.ComposedUpdateFunction.((trunc,), vel_update_funcs, deepcopy(vels))
+        vel_funcs  = Spaces.ComposedUpdateFunction.((trunc,), vel_update_funcs , deepcopy(vels))
+        vel_funcs! = Spaces.ComposedUpdateFunction.((trunc,), vel_update_funcs!, deepcopy(vels))
 
-        Spaces._pair_update_funcs((F,) .\ vels, vel_funcs)
+        Spaces._pair_update_funcs((F,) .\ vels, vel_funcs, vel_funcs!)
     end
 
     MM  = Diagonal([M  for i=1:D])
