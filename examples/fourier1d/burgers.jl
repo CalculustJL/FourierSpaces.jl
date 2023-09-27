@@ -75,7 +75,7 @@ function solve_burgers1D(N, ν, p;
     # model setup
     A = -diffusionOp(ν, V, discr)
     C = advectionOp((zero(u0),), V, discr; vel_update_funcs! = (burgers!,))
-    F = forcingOp(zero(u0), V, discr; f_update_func=forcing!)
+    F = forcingOp(zero(u0), V, discr; f_update_func! = forcing!)
 
     odefunc = cache_operator(A-C+F, u0)
 
