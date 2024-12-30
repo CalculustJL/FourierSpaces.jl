@@ -9,6 +9,7 @@ let
 end
 
 using OrdinaryDiffEq, LinearAlgebra
+using MLDataDevices
 using Plots, Test
 
 using CUDA
@@ -20,7 +21,7 @@ p = nothing
 
 """ space discr """
 V = FourierSpace(N)
-V = gpu(V)
+V = gpu_device()(V)
 discr = Collocation()
 
 (x,) = points(V)
@@ -40,12 +41,12 @@ F = cache_operator(F, x)
 tspan = (0f0, 10f0) 
 tsave = range(tspan...; length=10)
 odealg = Tsit5()
-prob = SplitODEProblem(A, F, gpu(u0), tspan, p)
+prob = SplitODEProblem(A, F, gpu_device()(u0), tspan, p)
 
 @time sol = solve(prob, odealg, saveat=tsave, reltol=1f-6)
 
 """ analysis """
-pred = cpu(Array(sol))
+pred = cpu_device()(Array(sol))
 
 u0 = Array(u0)
 utrue(t) = @. u0 * (exp(-ν*α^2*t))

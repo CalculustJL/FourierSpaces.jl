@@ -21,6 +21,8 @@ function (::Type{T})(V::FourierSpace) where{T<:Number}
     make_transform(V, u0; p=p)
 end
 
+MLDataDevices.isleaf(::FourierSpace) = true
+
 function Adapt.adapt_structure(to, V::FourierSpace)
     grid  = adapt_structure(to, points(V))
     freqs = adapt_structure(to, modes(V))

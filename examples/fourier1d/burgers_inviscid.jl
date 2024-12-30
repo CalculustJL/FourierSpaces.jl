@@ -9,6 +9,7 @@ let
 end
 
 using CUDA, OrdinaryDiffEq, LinearAlgebra, Random
+using MLDataDevices
 using Plots#, BSON
 
 Random.seed!(0)
@@ -43,7 +44,7 @@ function burgers_inviscid(N, mu = LinRange(0.5, 1.4, 10)', p = nothing;
     tspan=(0.f0, 0.5f0),
     tsave=100,
     odealg=SSPRK43(),
-    device = cpu,
+	device = cpu_device(),
 )
 
     """ space discr """
@@ -85,15 +86,15 @@ function burgers_inviscid(N, mu = LinRange(0.5, 1.4, 10)', p = nothing;
     @time sol = solve(prob, odealg, saveat=tsave, callback=odecb)
     @show sol.retcode
 
-    x = x     |> cpu
+	x = x     |> cpu_device()
     u = sol   |> Array
-    t = sol.t |> cpu
-    V = V     |> cpu
+	t = sol.t |> cpu_device()
+	V = V     |> cpu_device()
 
     (sol, V), (x, u, t,)
 end
 
-(sol, V), (x, u, t) = burgers_inviscid(N; device = cpu)
+(sol, V), (x, u, t) = burgers_inviscid(N; device = cpu_device())
 
 plt = plot(x, @view u[:, 1, begin:49:end])
 display(plt)

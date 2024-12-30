@@ -1,7 +1,15 @@
 #
 using FourierSpaces
+let
+    # add dependencies to env stack
+    pkgpath = dirname(dirname(pathof(FourierSpaces)))
+    tstpath = joinpath(pkgpath, "test")
+    !(tstpath in LOAD_PATH) && push!(LOAD_PATH, tstpath)
+    nothing
+end
 
 using OrdinaryDiffEq, LinearAlgebra, CUDA
+using MLDataDevices
 using Plots, Test
 
 N = 1024
@@ -9,8 +17,8 @@ Nmodes = 10
 ν = 1e-3
 p = nothing
 
-device = gpu
-device = cpu
+device = gpu_device()
+device = cpu_device()
 
 odecb = begin
     function affect!(int)

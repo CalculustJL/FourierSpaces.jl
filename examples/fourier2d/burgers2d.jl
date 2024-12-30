@@ -15,6 +15,7 @@ let
     nothing
 end
 
+using MLDataDevices
 using OrdinaryDiffEq, Plots
 using ComponentArrays, CUDA
 
@@ -22,6 +23,7 @@ T = Float64
 nx = ny = 256
 N = nx * ny
 ν = 1e-3 |> T
+μ = 0.9  |> T
 p = nothing
 
 abstol = reltol = 1e-4 |> T
@@ -48,7 +50,7 @@ end
 
 """ IC """
 
-function uIC(x, y; μ = 0.9) # 0.9 - 1.1
+function uIC(x, y; μ = μ) # 0.9 - 1.1
     u = @. μ * sin(2π * x) * sin(2π * y)
     u[x .> 0.5] .= 0
     u[y .> 0.5] .= 0
@@ -63,10 +65,10 @@ V = make_transform(V, u0.vx; p=ps)
 
 # GPU
 #CUDA.allowscalar(false)
-#V = V |> gpu
+#V = V |> gpu_device()
 #x, y = points(V)
-#u0 = u0 |> gpu
-#ps = ps |> gpu
+#u0 = u0 |> gpu_device()
+#ps = ps |> gpu_device()
 
 """ spce ops """
 Ax = -diffusionOp(ν, V, discr)
@@ -123,9 +125,33 @@ prob  = ODEProblem(ddt, u0, tspan, p)
 
 @time sol = solve(prob, odealg; saveat = tsave, abstol, reltol, callback)
 
+t = sol.t
+
 pred = Array(sol)
 vx = @views pred[:vx, :]
 vy = @views pred[:vy, :]
+
+############
+
+x_re = reshape(x , nx, ny)
+y_re = reshape(y , nx, ny)
+u_re = reshape(vx, nx, ny, :)
+
+u_slice1 = u_re[:, Int(nx/2), :] # y = 0.5
+u_slice2 = u_re[Int(nx/2), :, :] # x = 0.5
+x_slice  = x[1:nx]
+
+V1D = FourierSpace(nx; domain = interval)
+
+anim = animate(u_slice1, V1D, t; w = 2.0, title = "y = 0.5")
+filename = joinpath(dirname(@__FILE__), "burgers_slice1" * ".gif")
+gif(anim, filename, fps = 20)
+
+anim = animate(u_slice2, V1D, t; w = 2.0, title = "x = 0.5")
+filename = joinpath(dirname(@__FILE__), "burgers_slice2" * ".gif")
+gif(anim, filename, fps = 20)
+
+############
 
 anim = animate(vx, V, sol.t)
 filename = joinpath(dirname(@__FILE__), "burgers_x" * ".gif")

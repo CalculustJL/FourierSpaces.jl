@@ -9,6 +9,7 @@ let
 end
 
 using CUDA, OrdinaryDiffEq, LinearAlgebra, Random
+using MLDataDevices
 using Plots
 
 Random.seed!(0)
@@ -48,7 +49,7 @@ function solve_burgers1D(N, ν, p;
     nsims=1,
     nsave=100,
     odealg=SSPRK43(),
-    device = cpu,
+	device = cpu_device(),
 )
 
     """ space discr """
@@ -87,8 +88,8 @@ function solve_burgers1D(N, ν, p;
     sol, V
 end
 
-sol, V = solve_burgers1D(N, ν, p; device = cpu)
-V = cpu(V)
+sol, V = solve_burgers1D(N, ν, p; device = cpu_device())
+V = cpu_device()(V)
 pred = Array(sol)
 
 anim = animate(pred[:,1,:], V, sol.t, legend=false, linewidth=2, color=:black, xlabel="x", ylabel="u(x,t)")
