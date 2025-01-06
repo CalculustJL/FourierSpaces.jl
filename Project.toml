@@ -1,7 +1,7 @@
 name = "FourierSpaces"
 uuid = "f3d7ce31-8807-4b9f-8144-4bd3ed8f0112"
 authors = ["Vedant Puri <vedantpuri@gmail.com>"]
-version = "0.2.6"
+version = "0.2.7"
 
 [deps]
 AbstractFFTs = "621f4979-c628-5d54-868e-fcf4e3e8185c"
