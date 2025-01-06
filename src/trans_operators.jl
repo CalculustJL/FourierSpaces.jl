@@ -31,7 +31,7 @@ function Spaces.truncationOp(Vh::TransformedFourierSpace{<:Any,D},
 
         diag[(Colon() for _ in 1:d-1)..., idx, (Colon() for i=d+1:D)...] .= false
     end
-    diag = points(Vh)[1] isa AbstractGPUArray ? gpu(diag) : diag
+    diag = points(Vh)[1] isa AbstractGPUArray ? gpu_device(diag) : diag
 
     DiagonalOperator(vec(diag))
 end

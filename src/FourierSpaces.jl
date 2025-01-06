@@ -13,7 +13,7 @@ using FFTW # TODO - rm FFTW and have user manually load backend
 using LinearAlgebra
 using SparseArrays
 
-import MLDataDevices
+using MLDataDevices
 using Adapt: Adapt, adapt_structure
 using GPUArraysCore: AbstractGPUArray, @allowscalar
 
